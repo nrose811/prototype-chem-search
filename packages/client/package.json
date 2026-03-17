@@ -14,7 +14,7 @@
     "test:browser": "vitest run browser"
   },
   "engines": {
-    "node": ">=20.0.0 <21.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "3dmol": "^2.5.4",
