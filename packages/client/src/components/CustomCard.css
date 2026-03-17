@@ -1,0 +1,27 @@
+.custom-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.custom-card[role="button"] {
+  cursor: pointer;
+}
+
+.custom-card[role="button"]:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.custom-card[role="button"]:active {
+  transform: translateY(0);
+}
+
+.custom-card[role="button"]:focus-visible {
+  outline: 2px solid #4E79A7;
+  outline-offset: 2px;
+}
+

@@ -1,0 +1,30 @@
+/* IT Admin Layout - Exact Production Match */
+.it-admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #e8edf2;
+}
+
+.it-admin-main-content {
+  flex: 1;
+  margin-left: 85px;
+  display: flex;
+  flex-direction: column;
+}
+
+.it-admin-page-content {
+  flex: 1;
+  padding: 0;
+  overflow: hidden;
+  background-color: #e8edf2;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .it-admin-main-content {
+    margin-left: 0;
+  }
+}
+

@@ -1,0 +1,389 @@
+#root {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.app-container h1 {
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.app-container h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.app-container h3 {
+  color: #333;
+}
+
+.app-container code {
+  background-color: #f0f0f0;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.app-container p {
+  color: #333;
+}
+
+/* Page Styles */
+.page-description {
+  color: #666;
+  margin-bottom: 2rem;
+  margin-top: 0rem;
+  font-size: 1.1rem;
+}
+
+/* Demo Grid Layout */
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* Clickable Card Wrapper */
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 8px;
+  outline: none;
+  display: flex;
+  height: 100%;
+}
+
+.clickable-card > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.clickable-card:hover {
+  transform: translateY(-4px);
+}
+
+.clickable-card:hover > * {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.clickable-card:active {
+  transform: translateY(-2px);
+}
+
+.clickable-card:focus-visible {
+  outline: 2px solid #4E79A7;
+  outline-offset: 2px;
+}
+
+/* Component Demo Containers */
+.component-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.demo-output {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+}
+
+/* Badge Demo */
+.badge-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.badge-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.badge-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.badge-row span {
+  min-width: 100px;
+  font-weight: 500;
+}
+
+/* Chart Container */
+.chart-container {
+  width: 100%;
+  min-height: 400px;
+  padding: 1rem 0;
+}
+
+/* Tooltip Demo */
+.tooltip-demo {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Card Actions */
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* Reduce top spacing in cards */
+.demo-grid > * h3:first-child,
+.demo-grid .clickable-card h3:first-child {
+  margin-top: 0;
+}
+
+.playground {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  width: 100%;
+  max-width: 900px;
+}
+
+.playground h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.playground-description {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.button-group button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.button-group button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.button-group button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  color: #666;
+  font-style: italic;
+}
+
+.response {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.response.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.response.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.response pre {
+  margin: 0.5rem 0 0 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 0.85rem;
+}
+
+/* Responsive Styles */
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+  .app-container {
+    max-width: 100%;
+    padding: 0 1.5rem;
+  }
+
+  .app-container h1 {
+    font-size: 2.25rem;
+  }
+
+  .app-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .demo-grid {
+    gap: 1.5rem;
+  }
+
+  .playground {
+    max-width: 100%;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0 1rem;
+  }
+
+  .app-container h1 {
+    font-size: 1.75rem;
+  }
+
+  .app-container h2 {
+    font-size: 1.25rem;
+  }
+
+  .demo-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .component-demo {
+    gap: 0.75rem;
+  }
+
+  .badge-row {
+    flex-wrap: wrap;
+  }
+
+  .chart-container {
+    min-height: 300px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+
+  .playground {
+    padding: 1rem;
+  }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0 0.75rem;
+  }
+
+  .app-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .app-container h2 {
+    font-size: 1.1rem;
+  }
+  .demo-grid {
+    gap: 1rem;
+  }
+
+  .component-demo {
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+  }
+
+  .chart-container {
+    min-height: 250px;
+  }
+
+  .badge-demo {
+    gap: 0.5rem;
+  }
+
+  .tooltip-demo {
+    gap: 0.75rem;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .card-actions button {
+    width: 100%;
+  }
+
+  .playground {
+    padding: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .response {
+    padding: 0.75rem;
+  }
+
+  .response pre {
+    font-size: 0.75rem;
+  }
+}

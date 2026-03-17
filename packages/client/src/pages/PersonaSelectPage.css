@@ -1,0 +1,86 @@
+.persona-select-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f7fa;
+}
+
+.persona-select-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.persona-logo {
+  width: 280px;
+  margin-bottom: 2rem;
+}
+
+.persona-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1e3a5f;
+  margin: 0 0 0.5rem 0;
+}
+
+.persona-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0 0 2.5rem 0;
+}
+
+.persona-cards {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.persona-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 320px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.persona-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+
+.persona-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9;
+  border-radius: 50%;
+  color: #1e3a5f;
+}
+
+.persona-card:hover .persona-icon {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+.persona-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e3a5f;
+  margin: 0 0 0.5rem 0;
+}
+
+.persona-card-description {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+

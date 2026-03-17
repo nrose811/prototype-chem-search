@@ -1,0 +1,19 @@
+.historical-chart-container {
+  width: 100%;
+  min-height: 400px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.historical-chart-container .js-plotly-plot {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.historical-chart-container .main-svg {
+  background: transparent !important;
+}
+

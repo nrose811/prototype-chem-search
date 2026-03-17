@@ -1,0 +1,174 @@
+/* IT Toolbar - Exact Production Match */
+.it-toolbar {
+  height: 50px;
+  background-color: rgb(5, 38, 62);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.it-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+}
+
+.it-toolbar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.it-toolbar-label {
+  color: #8b9bb0;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.it-toolbar-org,
+.it-toolbar-project {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+}
+
+.it-toolbar-org-icon {
+  display: flex;
+  align-items: center;
+}
+
+.it-toolbar-org-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.it-toolbar-org-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.it-toolbar-org-slug {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #8b9bb0;
+}
+
+.it-toolbar-project-icon {
+  color: #5a7a9a;
+}
+
+.it-toolbar-project-name {
+  font-style: italic;
+  color: #8b9bb0;
+  font-size: 0.875rem;
+}
+
+.it-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.it-toolbar-help {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.it-toolbar-help:hover {
+  opacity: 0.8;
+}
+
+.it-toolbar-account {
+  position: relative;
+}
+
+.it-toolbar-account-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: opacity 0.2s;
+}
+
+.it-toolbar-account-button:hover {
+  opacity: 0.8;
+}
+
+.it-toolbar-account .account-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.it-toolbar-account .account-dropdown-header {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.it-toolbar-account .account-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.it-toolbar-account .account-email {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.it-toolbar-account .account-dropdown-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0.25rem 0;
+}
+
+.it-toolbar-account .account-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  color: #666;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.it-toolbar-account .account-dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+}
+
+.it-toolbar-account .account-dropdown-item svg {
+  flex-shrink: 0;
+  color: #666;
+}

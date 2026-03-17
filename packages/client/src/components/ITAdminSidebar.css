@@ -1,0 +1,86 @@
+/* IT Admin Sidebar - Exact Production TetraScience Platform Match */
+.it-admin-sidebar {
+  width: 85px;
+  background-color: rgb(5, 38, 62);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.it-sidebar-header {
+  padding: 0.75rem 0.5rem 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.it-sidebar-logo {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+.it-sidebar-items {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.it-sidebar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: default;
+  color: #ffffff;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: visible;
+}
+
+.it-sidebar-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
+.it-sidebar-item-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.it-sidebar-item-label {
+  font-size: 0.5625rem;
+  line-height: 1.2;
+  max-width: 75px;
+  white-space: normal;
+  word-wrap: break-word;
+  hyphens: none;
+}
+
+.it-sidebar-item.active {
+  background-color: #2563eb;
+  border-radius: 6px;
+  margin: 0 0.25rem;
+}
+
+.it-sidebar-item.active .it-sidebar-item-icon svg {
+  stroke: #ffffff;
+}
+

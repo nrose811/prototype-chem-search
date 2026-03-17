@@ -1,0 +1,281 @@
+/* Layout Container */
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sidebar Wrapper */
+.sidebar-wrapper {
+  transition: width 0.3s ease-in-out;
+  z-index: 1000;
+  background-color: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  overflow: visible;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color);
+}
+
+.sidebar-wrapper.collapsed {
+  width: 60px;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-button {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-button:hover {
+  background-color: var(--hover-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.mobile-menu-button:active {
+  transform: scale(0.95);
+}
+
+.mobile-menu-button svg {
+  color: var(--text-primary);
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page Content (below toolbar) */
+.page-content {
+  flex: 1;
+  padding: 1rem 2rem 2rem 2rem;
+  min-height: 0;
+  transition: margin-right 0.3s ease-in-out;
+}
+
+/* When assistant is open, reduce available width to keep content centered */
+.main-content:has(.assistant-open) .page-content,
+.main-content:has(.search-assistant.open) .page-content {
+  margin-right: 400px; /* Width of assistant panel */
+}
+
+/* When assistant is open, push toolbar content left */
+.main-content:has(.assistant-open) .toolbar-content,
+.main-content:has(.search-assistant.open) .toolbar-content {
+  margin-right: 400px;
+  transition: margin-right 0.3s ease-in-out;
+}
+
+@media (max-width: 900px) {
+  .main-content:has(.assistant-open) .page-content,
+  .main-content:has(.search-assistant.open) .page-content {
+    margin-right: 0;
+  }
+
+  .main-content:has(.assistant-open) .toolbar-content,
+  .main-content:has(.search-assistant.open) .toolbar-content {
+    margin-right: 0;
+  }
+}
+
+/* Desktop and Tablet Styles - Sidebar always visible */
+@media (min-width: 480px) {
+  .sidebar-wrapper {
+    position: relative;
+  }
+
+  .mobile-menu-button {
+    display: none;
+  }
+
+  .mobile-overlay {
+    display: none;
+  }
+}
+
+/* Tablet - Auto-collapse sidebar */
+@media (max-width: 1023px) and (min-width: 480px) {
+  .page-content {
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+  }
+}
+
+/* Mobile Styles - Hide sidebar, show hamburger menu */
+@media (max-width: 479px) {
+  .sidebar-wrapper.mobile-closed {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+  }
+
+  .sidebar-wrapper.mobile-open {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+
+  .mobile-menu-button {
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.625rem;
+  }
+}
+
+/* Responsive adjustments for content */
+@media (max-width: 767px) {
+  .app-container {
+    padding: 0 0.5rem;
+  }
+
+  .demo-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-container {
+    min-height: 300px;
+  }
+}
+
+/* Steel Blue sidebar styling */
+.light-grey-sidebar {
+  background-color: #4E79A7 !important;
+}
+
+/* Override all nested elements */
+.light-grey-sidebar > *,
+.light-grey-sidebar nav,
+.light-grey-sidebar aside,
+.light-grey-sidebar div[class*="sidebar"],
+.light-grey-sidebar div[class*="Sidebar"] {
+  background-color: #4E79A7 !important;
+}
+
+/* Deep override for all descendants */
+.light-grey-sidebar * {
+  --sidebar-bg: #4E79A7;
+  --sidebar-background: #4E79A7;
+  --background: #4E79A7;
+  --bg: #4E79A7;
+}
+
+/* Ensure sidebar items have high contrast text */
+.light-grey-sidebar [class*="item"],
+.light-grey-sidebar [class*="Item"],
+.light-grey-sidebar a,
+.light-grey-sidebar button,
+.light-grey-sidebar span,
+.light-grey-sidebar label {
+  color: #ecf0f1 !important;
+  font-weight: 500 !important;
+}
+
+/* Active/hover states for sidebar items */
+.light-grey-sidebar [class*="active"],
+.light-grey-sidebar [aria-current="page"],
+.light-grey-sidebar [data-active="true"] {
+  background-color: #3d5f7f !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.light-grey-sidebar a:hover,
+.light-grey-sidebar button:hover {
+  background-color: #5a8bc4 !important;
+  color: #ffffff !important;
+}
+
+/* Icon colors - high contrast */
+.light-grey-sidebar svg,
+.light-grey-sidebar [class*="icon"],
+.light-grey-sidebar [class*="Icon"] {
+  color: #bdc3c7 !important;
+  fill: #bdc3c7 !important;
+}
+
+/* Active and hover icon colors */
+.light-grey-sidebar [class*="active"] svg,
+.light-grey-sidebar [class*="active"] [class*="icon"],
+.light-grey-sidebar [aria-current="page"] svg,
+.light-grey-sidebar a:hover svg,
+.light-grey-sidebar button:hover svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Horizontal layout for sidebar items */
+.light-grey-sidebar a,
+.light-grey-sidebar button {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  padding: 0.75rem 1rem !important;
+  text-align: left !important;
+}
+
+.light-grey-sidebar svg,
+.light-grey-sidebar [class*="icon"] {
+  flex-shrink: 0 !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.light-grey-sidebar span {
+  white-space: nowrap !important;
+}
+

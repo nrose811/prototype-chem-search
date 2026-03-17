@@ -1,0 +1,27 @@
+{
+    "name": "TetraScience",
+    "description": "A prototype of the Tetra Scientist Experience",
+    "namespace": "private-training-onboarding",
+    "slug": "ts-pattern-app",
+    "version": "v4.5.0",
+    "icon": "images/icon.png",
+    "type": "connector",
+    "labels": [
+        {
+            "name": "subtype",
+            "value": "data-app"
+        },
+        {
+            "name": "ts-routing-style",
+            "value": "subdomain"
+        }
+    ],
+    "exposesPorts": {
+      "3000": {
+        "description": "http",
+        "required": true,
+        "hubDefaultPort": 3000
+      }
+    },
+    "platformRequirements": []
+}

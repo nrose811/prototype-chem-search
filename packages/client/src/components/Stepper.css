@@ -1,0 +1,163 @@
+/* Stepper Container */
+.stepper {
+  display: flex;
+  align-items: flex-start;
+  margin: 1.5rem 0 2.5rem 0;
+  padding: 0;
+  position: relative;
+}
+
+/* Stepper Item */
+.stepper-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Stepper Step Wrapper (contains step circle and line) */
+.stepper-step-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
+
+/* Stepper Step Circle */
+.stepper-step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.stepper-step.active {
+  background-color: #4E79A7;
+  color: white;
+  box-shadow: 0 0 0 4px rgba(78, 121, 167, 0.2);
+}
+
+.stepper-step.completed {
+  background-color: #59A14F;
+  color: white;
+}
+
+/* Stepper Line - positioned absolutely to not affect layout */
+.stepper-line {
+  position: absolute;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
+  height: 2px;
+  background-color: #e0e0e0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  transition: background-color 0.3s ease;
+}
+
+.stepper-line.completed {
+  background-color: #59A14F;
+}
+
+/* Stepper Label */
+.stepper-label {
+  margin-top: 0.5rem;
+  text-align: center;
+  width: 100%;
+  padding: 0 0.5rem;
+}
+
+.stepper-label-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 0.15rem;
+}
+
+.stepper-label-description {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+/* Form Step Container */
+.form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 200px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .stepper {
+    padding: 0 0.5rem;
+  }
+
+  .stepper-step {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .stepper-label {
+    max-width: 80px;
+  }
+
+  .stepper-label-title {
+    font-size: 0.75rem;
+  }
+
+  .stepper-label-description {
+    font-size: 0.65rem;
+  }
+
+  .stepper-line {
+    margin-left: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stepper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stepper-item {
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .stepper-step-wrapper {
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+  }
+
+  .stepper-line {
+    width: 2px;
+    height: 30px;
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+
+  .stepper-label {
+    margin-top: 0;
+    margin-left: 1rem;
+    text-align: left;
+    max-width: none;
+  }
+}
+
