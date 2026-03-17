@@ -64,8 +64,9 @@ export default function SignatureWidget({
       // Brief pause so the user sees the success state
       setTimeout(() => onSuccess(result.signature), 900);
     } else {
-      recordSignatureFailed(batchId, datasetVersion, result.error);
-      setErrorMsg(result.error);
+      const errorText = (result as { ok: false; error: string }).error;
+      recordSignatureFailed(batchId, datasetVersion, errorText);
+      setErrorMsg(errorText);
       setState('error');
     }
   };

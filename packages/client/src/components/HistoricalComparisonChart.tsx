@@ -58,11 +58,11 @@ function HistoricalComparisonChart({ analyte, className }: HistoricalComparisonC
   }, [analytes, filteredData]);
 
   const layout: Partial<Plotly.Layout> = {
-    title: analyte
+    title: { text: analyte
       ? `Historical Comparison: ${analyte}`
-      : 'Historical Comparison: All Analytes',
-    xaxis: { title: 'Date', type: 'date' },
-    yaxis: { title: 'Result' },
+      : 'Historical Comparison: All Analytes' },
+    xaxis: { title: { text: 'Date' }, type: 'date' },
+    yaxis: { title: { text: 'Result' } },
     hovermode: 'closest',
     autosize: true,
     margin: { l: 60, r: 40, t: 50, b: 60 },

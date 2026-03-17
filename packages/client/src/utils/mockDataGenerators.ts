@@ -921,6 +921,14 @@ export const DATA_GENERATORS: Record<ChartType, () => MockDataResult> = {
 	'manhattan-plot': generateManhattanPlotData,
 	'sashimi-plot': generateCoverageTrackData, // Coverage with splice junctions
 	'assembly-graph': generateChemicalSpaceData, // Network graph (simplified)
+	// Benchling integration
+	'benchling-assay-scatter': generateScatterPlotData,
+	'benchling-assay-bar': generateBarChartData,
+	'benchling-inventory-timeline': generateLineChartData,
+	'benchling-inventory-status': generatePieData,
+	'benchling-entries-author': generateBarChartData,
+	'benchling-entries-timeline': generateLineChartData,
+	'benchling-dna-lengths': generateBarChartData,
 };
 
 export const getMockDataForChart = (chartType: ChartType): MockDataResult => {

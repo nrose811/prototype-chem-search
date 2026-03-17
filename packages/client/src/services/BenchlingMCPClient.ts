@@ -103,7 +103,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_dna_sequences",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<DNASequence[]>(result);
 	}
@@ -125,7 +125,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_custom_entities",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<CustomEntity[]>(result);
 	}
@@ -147,7 +147,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_assay_results",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<AssayResult[]>(result);
 	}
@@ -169,7 +169,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_containers",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<Container[]>(result);
 	}
@@ -191,7 +191,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_plates",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<Plate[]>(result);
 	}
@@ -213,7 +213,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_boxes",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<Box[]>(result);
 	}
@@ -235,7 +235,7 @@ export class BenchlingMCPClient {
 		this.ensureConnected();
 		const result = await this.client!.callTool({
 			name: "list_entries",
-			arguments: filters,
+			arguments: filters as Record<string, unknown>,
 		});
 		return this.parseToolResponse<NotebookEntry[]>(result);
 	}
