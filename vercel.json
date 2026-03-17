@@ -1,6 +1,6 @@
 {
   "buildCommand": "yarn workspace @ts-tdp-sci-ux/client build",
-  "outputDirectory": "dist",
+  "outputDirectory": "packages/client/dist",
   "installCommand": "yarn install"
 }
 
