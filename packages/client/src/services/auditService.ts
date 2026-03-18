@@ -23,10 +23,25 @@ export function addAuditEvent(event: AuditEvent): void {
   auditLog.push(event);
 }
 
+/** Optional context to customize audit event origin / entity for different apps. */
+export interface AuditContext {
+  origin?: string;
+  entityName?: string;
+}
+
+const DEFAULT_CONTEXT: Required<AuditContext> = {
+  origin: 'CRO Data Review App v1.4.0',
+  entityName: 'CRO Alpha -- Batch 42',
+};
+
 /**
  * Record a successful signature event.
  */
-export function recordSignatureApplied(signature: SignatureRecord): AuditEvent {
+export function recordSignatureApplied(
+  signature: SignatureRecord,
+  ctx?: AuditContext,
+): AuditEvent {
+  const { origin, entityName } = { ...DEFAULT_CONTEXT, ...ctx };
   const event: AuditEvent = {
     eventId: `evt-${Date.now()}`,
     eventType: 'E-Signature Applied',
@@ -38,8 +53,8 @@ export function recordSignatureApplied(signature: SignatureRecord): AuditEvent {
     result: 'SUCCESS',
     datasetVersion: signature.datasetVersion,
     reason: `Signed with meaning: "${signature.meaning}"`,
-    origin: 'CRO Data Review App v1.4.0',
-    entityName: 'CRO Alpha -- Batch 42',
+    origin,
+    entityName,
     entityType: 'Signature',
     entityId: signature.signatureId,
     details: {
@@ -61,7 +76,9 @@ export function recordSignatureFailed(
   batchId: string,
   datasetVersion: string,
   reason: string,
+  ctx?: AuditContext,
 ): AuditEvent {
+  const { origin, entityName } = { ...DEFAULT_CONTEXT, ...ctx };
   const event: AuditEvent = {
     eventId: `evt-${Date.now()}`,
     eventType: 'E-Signature Failed',
@@ -73,8 +90,8 @@ export function recordSignatureFailed(
     result: 'FAILURE',
     datasetVersion,
     reason,
-    origin: 'CRO Data Review App v1.4.0',
-    entityName: 'CRO Alpha -- Batch 42',
+    origin,
+    entityName,
     entityType: 'Signature',
     entityId: batchId,
     details: {

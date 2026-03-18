@@ -369,3 +369,178 @@ export const SEED_AUDIT_EVENTS: AuditEvent[] = [
     entityId: 'batch-042',
   },
 ];
+
+// ============================================================
+// HIC QC Data App — Mock Data
+// ============================================================
+
+export interface HicPeakColumn {
+  area: number | null;
+  rt: number | null;
+  hydro_id: string | null;
+}
+
+export interface HicSampleRow {
+  sample_id: string;
+  sample_set_id: string | null;
+  sample_set_name: string | null;
+  qc_status: string | null;
+  injection_time: string | null;
+  sample_name: string | null;
+  concentration: number | null;
+  batch_id: string | null;
+  target_product_protein_name: string | null;
+  system_name: string | null;
+  hydro_id: string | null;
+  channel_name: string | null;
+  peak_1: HicPeakColumn | null;
+  peak_2: HicPeakColumn | null;
+  peak_3: HicPeakColumn | null;
+  peak_4: HicPeakColumn | null;
+  peak_5: HicPeakColumn | null;
+  peak_6: HicPeakColumn | null;
+}
+
+export interface HicSampleSet {
+  sample_set_id: string;
+  sample_set_name: string | null;
+  system_name: string | null;
+  samples: HicSampleRow[];
+}
+
+export interface ChromatogramSeries {
+  label: string;
+  time: number[];
+  intensity: number[];
+}
+
+// Helper to generate a simple gaussian-ish peak
+function gaussianPeak(center: number, height: number, width: number, points: number[]): number[] {
+  return points.map((t) => height * Math.exp(-0.5 * ((t - center) / width) ** 2));
+}
+
+function generateTime(start: number, end: number, step: number): number[] {
+  const arr: number[] = [];
+  for (let t = start; t <= end; t += step) arr.push(Math.round(t * 100) / 100);
+  return arr;
+}
+
+const HIC_TIME = generateTime(0, 30, 0.1);
+
+function buildChromatogram(peaks: { center: number; height: number; width: number }[]): number[] {
+  const baseline = HIC_TIME.map(() => Math.random() * 2);
+  for (const p of peaks) {
+    const g = gaussianPeak(p.center, p.height, p.width, HIC_TIME);
+    for (let i = 0; i < baseline.length; i++) baseline[i] += g[i];
+  }
+  return baseline.map((v) => Math.round(v * 10) / 10);
+}
+
+// -- HIC Sample Sets --
+export const HIC_SAMPLE_SETS: HicSampleSet[] = [
+  {
+    sample_set_id: 'ss-001',
+    sample_set_name: 'mAb-A Lot 2026-03',
+    system_name: 'Agilent 1260 Infinity II',
+    samples: [
+      {
+        sample_id: 'hic-s-001', sample_set_id: 'ss-001', sample_set_name: 'mAb-A Lot 2026-03',
+        qc_status: 'Pass', injection_time: '2026-03-10T08:15:00Z',
+        sample_name: 'mAb-A Sample 1', concentration: 5.0, batch_id: 'LOT-2026-03',
+        target_product_protein_name: 'mAb-A', system_name: 'Agilent 1260 Infinity II',
+        hydro_id: 'Low', channel_name: '280 nm',
+        peak_1: { area: 85.2, rt: 4.3, hydro_id: 'Low' },
+        peak_2: { area: 10.1, rt: 7.8, hydro_id: 'Medium' },
+        peak_3: { area: 4.7, rt: 12.1, hydro_id: 'High' },
+        peak_4: null, peak_5: null, peak_6: null,
+      },
+      {
+        sample_id: 'hic-s-002', sample_set_id: 'ss-001', sample_set_name: 'mAb-A Lot 2026-03',
+        qc_status: 'Pass', injection_time: '2026-03-10T08:45:00Z',
+        sample_name: 'mAb-A Sample 2', concentration: 5.0, batch_id: 'LOT-2026-03',
+        target_product_protein_name: 'mAb-A', system_name: 'Agilent 1260 Infinity II',
+        hydro_id: 'Low', channel_name: '280 nm',
+        peak_1: { area: 86.0, rt: 4.4, hydro_id: 'Low' },
+        peak_2: { area: 9.8, rt: 7.7, hydro_id: 'Medium' },
+        peak_3: { area: 4.2, rt: 12.0, hydro_id: 'High' },
+        peak_4: null, peak_5: null, peak_6: null,
+      },
+      {
+        sample_id: 'hic-s-003', sample_set_id: 'ss-001', sample_set_name: 'mAb-A Lot 2026-03',
+        qc_status: 'Pass', injection_time: '2026-03-10T09:15:00Z',
+        sample_name: 'mAb-A Sample 3', concentration: 5.0, batch_id: 'LOT-2026-03',
+        target_product_protein_name: 'mAb-A', system_name: 'Agilent 1260 Infinity II',
+        hydro_id: 'Low', channel_name: '280 nm',
+        peak_1: { area: 84.8, rt: 4.3, hydro_id: 'Low' },
+        peak_2: { area: 10.5, rt: 7.9, hydro_id: 'Medium' },
+        peak_3: { area: 4.7, rt: 12.2, hydro_id: 'High' },
+        peak_4: null, peak_5: null, peak_6: null,
+      },
+    ],
+  },
+  {
+    sample_set_id: 'ss-002',
+    sample_set_name: 'mAb-B Lot 2026-02',
+    system_name: 'Waters Alliance e2695',
+    samples: [
+      {
+        sample_id: 'hic-s-004', sample_set_id: 'ss-002', sample_set_name: 'mAb-B Lot 2026-02',
+        qc_status: 'Fail', injection_time: '2026-03-11T10:00:00Z',
+        sample_name: 'mAb-B Sample 1', concentration: 10.0, batch_id: 'LOT-2026-02',
+        target_product_protein_name: 'mAb-B', system_name: 'Waters Alliance e2695',
+        hydro_id: 'High', channel_name: '215 nm',
+        peak_1: { area: 42.5, rt: 5.1, hydro_id: 'Low' },
+        peak_2: { area: 18.3, rt: 8.4, hydro_id: 'Medium' },
+        peak_3: { area: 25.0, rt: 13.7, hydro_id: 'High' },
+        peak_4: { area: 14.2, rt: 18.2, hydro_id: 'High' },
+        peak_5: null, peak_6: null,
+      },
+      {
+        sample_id: 'hic-s-005', sample_set_id: 'ss-002', sample_set_name: 'mAb-B Lot 2026-02',
+        qc_status: 'Inconclusive', injection_time: '2026-03-11T10:30:00Z',
+        sample_name: 'mAb-B Sample 2', concentration: 10.0, batch_id: 'LOT-2026-02',
+        target_product_protein_name: 'mAb-B', system_name: 'Waters Alliance e2695',
+        hydro_id: 'Medium', channel_name: '215 nm',
+        peak_1: { area: 55.1, rt: 5.0, hydro_id: 'Low' },
+        peak_2: { area: 22.7, rt: 8.6, hydro_id: 'Medium' },
+        peak_3: { area: 22.2, rt: 13.5, hydro_id: 'High' },
+        peak_4: null, peak_5: null, peak_6: null,
+      },
+    ],
+  },
+  {
+    sample_set_id: 'ss-003',
+    sample_set_name: 'mAb-A Lot 2026-04',
+    system_name: 'Agilent 1260 Infinity II',
+    samples: [
+      {
+        sample_id: 'hic-s-006', sample_set_id: 'ss-003', sample_set_name: 'mAb-A Lot 2026-04',
+        qc_status: 'Pass', injection_time: '2026-03-14T14:00:00Z',
+        sample_name: 'mAb-A Sample 4', concentration: 5.0, batch_id: 'LOT-2026-04',
+        target_product_protein_name: 'mAb-A', system_name: 'Agilent 1260 Infinity II',
+        hydro_id: 'Low', channel_name: '280 nm',
+        peak_1: { area: 87.1, rt: 4.2, hydro_id: 'Low' },
+        peak_2: { area: 9.2, rt: 7.6, hydro_id: 'Medium' },
+        peak_3: { area: 3.7, rt: 11.9, hydro_id: 'High' },
+        peak_4: null, peak_5: null, peak_6: null,
+      },
+    ],
+  },
+];
+
+// -- Mock chromatogram data for each sample --
+export const HIC_CHROMATOGRAMS: Record<string, ChromatogramSeries> = {
+  'hic-s-001': { label: 'mAb-A Sample 1', time: HIC_TIME, intensity: buildChromatogram([{ center: 4.3, height: 850, width: 0.6 }, { center: 7.8, height: 100, width: 0.5 }, { center: 12.1, height: 47, width: 0.7 }]) },
+  'hic-s-002': { label: 'mAb-A Sample 2', time: HIC_TIME, intensity: buildChromatogram([{ center: 4.4, height: 860, width: 0.6 }, { center: 7.7, height: 98, width: 0.5 }, { center: 12.0, height: 42, width: 0.7 }]) },
+  'hic-s-003': { label: 'mAb-A Sample 3', time: HIC_TIME, intensity: buildChromatogram([{ center: 4.3, height: 848, width: 0.6 }, { center: 7.9, height: 105, width: 0.5 }, { center: 12.2, height: 47, width: 0.7 }]) },
+  'hic-s-004': { label: 'mAb-B Sample 1', time: HIC_TIME, intensity: buildChromatogram([{ center: 5.1, height: 425, width: 0.7 }, { center: 8.4, height: 183, width: 0.6 }, { center: 13.7, height: 250, width: 0.8 }, { center: 18.2, height: 142, width: 0.7 }]) },
+  'hic-s-005': { label: 'mAb-B Sample 2', time: HIC_TIME, intensity: buildChromatogram([{ center: 5.0, height: 551, width: 0.7 }, { center: 8.6, height: 227, width: 0.6 }, { center: 13.5, height: 222, width: 0.8 }]) },
+  'hic-s-006': { label: 'mAb-A Sample 4', time: HIC_TIME, intensity: buildChromatogram([{ center: 4.2, height: 871, width: 0.6 }, { center: 7.6, height: 92, width: 0.5 }, { center: 11.9, height: 37, width: 0.7 }]) },
+};
+
+// -- Standard reference chromatogram --
+export const HIC_STANDARD_CHROMATOGRAM: ChromatogramSeries = {
+  label: 'HIC Standard Reference',
+  time: HIC_TIME,
+  intensity: buildChromatogram([{ center: 4.5, height: 900, width: 0.55 }, { center: 8.0, height: 80, width: 0.45 }, { center: 12.0, height: 30, width: 0.65 }]),
+};

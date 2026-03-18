@@ -7,7 +7,7 @@
 // Session-scoped (in-memory).
 // ============================================================
 
-import { SignatureRecord, BatchReview, DEMO_BATCH, DEMO_USER } from '../mocks/demoData';
+import { SignatureRecord, BatchReview, DEMO_BATCH, DEMO_USER, HicSampleSet } from '../mocks/demoData';
 
 export interface SignedReport {
   reportId: string;
@@ -69,3 +69,57 @@ export function resetReport(): void {
   storedReport = null;
 }
 
+// ============================================================
+// HIC QC Report
+// ============================================================
+
+export interface HicQcSignedReport {
+  reportId: string;
+  generatedAt: string;
+  signature: SignatureRecord;
+  sampleSets: HicSampleSet[];
+  comments: string;
+  totalSamples: number;
+  passCount: number;
+  failCount: number;
+}
+
+let storedHicReport: HicQcSignedReport | null = null;
+
+/**
+ * Create and store a signed HIC QC report.
+ */
+export function createHicQcReport(
+  signature: SignatureRecord,
+  sampleSets: HicSampleSet[],
+  comments: string,
+): HicQcSignedReport {
+  const totalSamples = sampleSets.reduce((n, ss) => n + ss.samples.length, 0);
+  const passCount = sampleSets.flatMap((ss) => ss.samples).filter((s) => s.qc_status === 'Pass').length;
+  const report: HicQcSignedReport = {
+    reportId: signature.reportId,
+    generatedAt: new Date().toISOString(),
+    signature,
+    sampleSets,
+    comments,
+    totalSamples,
+    passCount,
+    failCount: totalSamples - passCount,
+  };
+  storedHicReport = report;
+  return report;
+}
+
+/**
+ * Retrieve the stored HIC QC report.
+ */
+export function getHicQcReport(): HicQcSignedReport | null {
+  return storedHicReport;
+}
+
+/**
+ * Clear stored HIC QC report (for demo reset).
+ */
+export function resetHicQcReport(): void {
+  storedHicReport = null;
+}

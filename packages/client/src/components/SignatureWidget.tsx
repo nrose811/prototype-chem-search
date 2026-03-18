@@ -16,6 +16,7 @@ import {
 import {
   recordSignatureApplied,
   recordSignatureFailed,
+  AuditContext,
 } from '../services/auditService';
 import './SignatureWidget.css';
 
@@ -26,6 +27,8 @@ interface SignatureWidgetProps {
   datasetVersion: string;
   onSuccess: (signature: SignatureRecord) => void;
   onClose: () => void;
+  /** Optional audit context for non-CRO apps (HIC QC, etc.) */
+  auditContext?: AuditContext;
 }
 
 export default function SignatureWidget({
@@ -33,6 +36,7 @@ export default function SignatureWidget({
   datasetVersion,
   onSuccess,
   onClose,
+  auditContext,
 }: SignatureWidgetProps) {
   const [meaning, setMeaning] = useState<SignatureMeaning>(SIGNATURE_MEANINGS[0]);
   const [password, setPassword] = useState('');
@@ -59,13 +63,13 @@ export default function SignatureWidget({
     });
 
     if (result.ok) {
-      recordSignatureApplied(result.signature);
+      recordSignatureApplied(result.signature, auditContext);
       setState('success');
       // Brief pause so the user sees the success state
       setTimeout(() => onSuccess(result.signature), 900);
     } else {
       const errorText = (result as { ok: false; error: string }).error;
-      recordSignatureFailed(batchId, datasetVersion, errorText);
+      recordSignatureFailed(batchId, datasetVersion, errorText, auditContext);
       setErrorMsg(errorText);
       setState('error');
     }

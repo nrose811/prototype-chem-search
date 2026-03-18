@@ -67,6 +67,14 @@ interface App {
 
 type FilterCategory = 'All Apps' | 'Favorite' | 'Featured' | 'Data' | 'AI' | 'Analytics' | 'Workflow';
 
+const BeakerIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4.5 3h15"></path>
+    <path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"></path>
+    <path d="M6 14h12"></path>
+  </svg>
+);
+
 const ClipboardCheckIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
@@ -86,6 +94,17 @@ function AppsPage() {
       title: 'CRO Data Review',
       description: 'Review CRO batch data, verify assay results, and apply e-signatures for approval',
       version: 'v1.4.0',
+      buttonText: 'OPEN',
+      buttonVariant: 'primary',
+      category: ['All Apps', 'Data', 'Featured'],
+      isFavorite: true,
+    },
+    {
+      id: 'hic-qc',
+      icon: <BeakerIcon />,
+      title: 'HIC QC Data',
+      description: 'Review hydrophobic interaction chromatography QC data and apply e-signatures',
+      version: 'v1.0.0',
       buttonText: 'OPEN',
       buttonVariant: 'primary',
       category: ['All Apps', 'Data', 'Featured'],
@@ -160,9 +179,9 @@ function AppsPage() {
   ];
 
   const filters: { label: FilterCategory; count: number }[] = [
-    { label: 'All Apps', count: 7 },
-    { label: 'Favorite', count: 3 },
-    { label: 'Featured', count: 4 },
+    { label: 'All Apps', count: 8 },
+    { label: 'Favorite', count: 4 },
+    { label: 'Featured', count: 5 },
   ];
 
   const filteredApps = apps.filter(app => {
@@ -218,6 +237,8 @@ function AppsPage() {
                 onClick={() => {
                   if (app.id === 'cro-data-review') {
                     navigate('/apps/cro-data-review');
+                  } else if (app.id === 'hic-qc') {
+                    navigate('/apps/hic-qc');
                   }
                 }}
               >
