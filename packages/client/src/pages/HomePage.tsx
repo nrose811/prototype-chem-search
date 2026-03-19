@@ -61,6 +61,12 @@ function HomePage() {
       subtitle: 'Pending Signature · 4 files · Received Mar 15',
       link: '/apps/cro-data-review',
     },
+    {
+      icon: <ClipboardIcon />,
+      title: 'HIC QC — mAb-A Lot 2026-03',
+      subtitle: 'Pending QC Review · 3 sample sets · Received Mar 17',
+      link: '/apps/hic-qc',
+    },
   ];
 
   const recommendedApps: CardItem[] = [
