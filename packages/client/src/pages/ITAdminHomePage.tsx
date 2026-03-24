@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useAuthProvider, AuthMode } from '../contexts/AuthProviderContext';
 import './ITAdminHomePage.css';
 
 // Icon components
@@ -45,7 +46,16 @@ interface CardItem {
   subtitle: string;
 }
 
+const LockIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+  </svg>
+);
+
 function ITAdminHomePage() {
+  const { authMode, setAuthMode } = useAuthProvider();
+
   const recommendedApps: CardItem[] = [
     {
       icon: <StarIcon />,
@@ -129,6 +139,33 @@ function ITAdminHomePage() {
         {renderSection('Recommended apps', recommendedApps, '/it/apps')}
         {renderSection('Saved searches', savedSearches, '/it/search')}
         {renderSection('Recent data', recentData, '/it/my-data')}
+      </div>
+
+      <div className="it-settings-section">
+        <h3 className="it-section-title">Platform Settings</h3>
+        <div className="it-section-card">
+          <div className="it-card-item it-settings-item">
+            <div className="it-card-icon"><LockIcon /></div>
+            <div className="it-card-content">
+              <div className="it-card-title">Authentication Method for E-Signatures</div>
+              <div className="it-card-subtitle">Controls how users re-authenticate when applying electronic signatures</div>
+            </div>
+            <div className="it-auth-toggle">
+              <button
+                className={`it-toggle-btn${authMode === 'password' ? ' active' : ''}`}
+                onClick={() => setAuthMode('password')}
+              >
+                Password
+              </button>
+              <button
+                className={`it-toggle-btn${authMode === 'sso' ? ' active' : ''}`}
+                onClick={() => setAuthMode('sso')}
+              >
+                SSO (Okta)
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -18,6 +18,50 @@ export interface SignedReport {
 
 let storedReport: SignedReport | null = null;
 
+// ---- Report file registry (mock file system) ----
+export interface ReportFile {
+  fileId: string;
+  fileName: string;
+  reportId: string;
+  generatedAt: string;
+  fileType: 'pdf';
+  sourceLocation: string;
+  routePath: string;
+}
+
+const reportFiles: ReportFile[] = [
+  {
+    fileId: 'rpt-file-001',
+    fileName: 'CRO-Data-Review-Signed-Report-Batch42.pdf',
+    reportId: 'rpt-batch-042-1710700800000',
+    generatedAt: '2026-03-15T14:30:05.000Z',
+    fileType: 'pdf',
+    sourceLocation: '/tetrasphere/reports/signed',
+    routePath: '/apps/cro-data-review/report/rpt-batch-042-1710700800000',
+  },
+];
+
+export function getReportFiles(): ReportFile[] {
+  return [...reportFiles];
+}
+
+export function getReportFile(fileId: string): ReportFile | undefined {
+  return reportFiles.find((f) => f.fileId === fileId);
+}
+
+function registerReportFile(report: SignedReport): void {
+  if (reportFiles.find((f) => f.reportId === report.reportId)) return;
+  reportFiles.push({
+    fileId: `rpt-file-${Date.now()}`,
+    fileName: `CRO-Data-Review-Signed-Report-${report.batchSnapshot.batchId}.pdf`,
+    reportId: report.reportId,
+    generatedAt: report.generatedAt,
+    fileType: 'pdf',
+    sourceLocation: '/tetrasphere/reports/signed',
+    routePath: `/apps/cro-data-review/report/${report.reportId}`,
+  });
+}
+
 // Default demo report for pre-signed demo files (file-001 through file-004)
 const DEFAULT_DEMO_REPORT: SignedReport = {
   reportId: 'rpt-batch-042-1710700800000',
@@ -52,6 +96,7 @@ export function createReport(
     batchSnapshot: { ...batch, status: 'SIGNED' },
   };
   storedReport = report;
+  registerReportFile(report);
   return report;
 }
 

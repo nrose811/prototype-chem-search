@@ -130,3 +130,12 @@
   }
 }
 
+
+
+.it-settings-section { margin-top: 2.5rem; }
+.it-settings-item { flex-wrap: wrap; }
+.it-auth-toggle { display: flex; gap: 0; border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+.it-toggle-btn { padding: 0.4rem 1rem; border: none; background: #fafafa; color: #666; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; font-weight: 500; }
+.it-toggle-btn:first-child { border-right: 1px solid #e0e0e0; }
+.it-toggle-btn.active { background: #1976d2; color: #fff; }
+.it-toggle-btn:hover:not(.active) { background: #f0f0f0; }

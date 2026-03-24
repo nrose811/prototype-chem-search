@@ -1,26 +1,13 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './FileDetailsPage.css';
 import SpreadsheetViewer, { SpreadsheetData } from '../components/SpreadsheetViewer';
 import FileAssistant from '../components/FileAssistant';
 import { DEMO_BATCH, DEMO_USER, SignatureRecord } from '../mocks/demoData';
 import { getReport } from '../services/reportService';
-import { verifyIntegrity, IntegrityCheckResult } from '../services/integrityService';
+import { useAuthProvider } from '../contexts/AuthProviderContext';
 
-// Default signature data for demo files when the user hasn't gone through the signing flow
-const DEFAULT_DEMO_SIGNATURE: SignatureRecord = {
-  signatureId: 'sig-demo-batch042-1710700800000',
-  signerId: DEMO_USER.userId,
-  signerName: DEMO_USER.name,
-  timestamp: '2026-03-15T14:30:00.000Z',
-  timezone: 'America/New_York',
-  meaning: 'Review and Approval',
-  authenticationMethod: 'Username + Password',
-  datasetVersion: 'v2.1.0',
-  reportId: 'rpt-batch-042-1710700800000',
-  status: 'APPLIED',
-  batchId: 'batch-042',
-};
+
 
 interface FileData {
   id: string;
@@ -130,26 +117,30 @@ function FileDetailsPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [integrityResult, setIntegrityResult] = useState<IntegrityCheckResult | null>(null);
-  const [verifying, setVerifying] = useState(false);
+  const [isOpenDropdownOpen, setIsOpenDropdownOpen] = useState(false);
+  const openDropdownRef = useRef<HTMLDivElement>(null);
+  const { authProvider } = useAuthProvider();
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openDropdownRef.current && !openDropdownRef.current.contains(event.target as Node)) {
+        setIsOpenDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   // Check if this file is part of the signed batch
   const report = getReport();
   const demoFile = DEMO_BATCH.files.find((f) => f.fileId === id);
   // Show signed state for demo batch files (pre-signed or live-signed)
   const isSigned = !!(demoFile);
-  const signature = report.signature;
-
-  const handleVerifyIntegrity = async () => {
-    if (!id) return;
-    setVerifying(true);
-    setIntegrityResult(null);
-    try {
-      const result = await verifyIntegrity(id);
-      setIntegrityResult(result);
-    } finally {
-      setVerifying(false);
-    }
+  // Use the report signature but reflect the current auth method for demo data
+  const signature: SignatureRecord = {
+    ...report.signature,
+    authenticationMethod: report.signature.authenticationMethod === 'Username + Password' && authProvider.type === 'sso'
+      ? `SSO – ${authProvider.label} (OIDC)`
+      : report.signature.authenticationMethod,
   };
 
   // Get data from navigation state, demo file lookup, or use default
@@ -208,12 +199,6 @@ function FileDetailsPage() {
       <div className="file-details-content">
         <div className="file-details-main">
           <div className="file-details-left">
-            {isSigned && (
-              <div className="gxp-signed-badge-bar">
-                <span className="gxp-badge">GxP Signed</span>
-                <span className="gxp-badge-detail">Electronically signed by {signature.signerName}</span>
-              </div>
-            )}
             <div className="attributes-section">
               <h3>Attributes</h3>
               {isSpreadsheet ? (
@@ -289,6 +274,46 @@ function FileDetailsPage() {
                   </div>
                 </>
               )}
+              {isSigned && (
+                <>
+                  <div className="attribute-item">
+                    <div className="attribute-value">Signed</div>
+                    <div className="attribute-label">eSignature Status</div>
+                    <button className="copy-btn" onClick={() => handleCopy('Signed', 'attr-esig-status')}>
+                      {copiedId === 'attr-esig-status' ? <CheckIcon /> : <CopyIcon />}
+                    </button>
+                  </div>
+                  <div className="attribute-item">
+                    <div className="attribute-value">{new Date(signature.timestamp).toLocaleString()}</div>
+                    <div className="attribute-label">eSignature Date</div>
+                    <button className="copy-btn" onClick={() => handleCopy(new Date(signature.timestamp).toLocaleString(), 'attr-esig-date')}>
+                      {copiedId === 'attr-esig-date' ? <CheckIcon /> : <CopyIcon />}
+                    </button>
+                  </div>
+                  <div className="attribute-item">
+                    <div className="attribute-value">{signature.signerName}</div>
+                    <div className="attribute-label">eSignature Signer</div>
+                    <button className="copy-btn" onClick={() => handleCopy(signature.signerName, 'attr-esig-signer')}>
+                      {copiedId === 'attr-esig-signer' ? <CheckIcon /> : <CopyIcon />}
+                    </button>
+                  </div>
+                  <div className="attribute-item">
+                    <div className="attribute-value">{signature.meaning}</div>
+                    <div className="attribute-label">eSignature Meaning</div>
+                    <button className="copy-btn" onClick={() => handleCopy(signature.meaning, 'attr-esig-meaning')}>
+                      {copiedId === 'attr-esig-meaning' ? <CheckIcon /> : <CopyIcon />}
+                    </button>
+                  </div>
+                  {demoFile && (
+                    <div className="attribute-item attribute-item-full">
+                      <div className="attribute-value">
+                        <code className="esign-manifest-json">{JSON.stringify({ version: demoFile.versionId, status: 'signed', timestamp: signature.timestamp }, null, 2)}</code>
+                      </div>
+                      <div className="attribute-label">esign_manifest</div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="information-section">
@@ -343,76 +368,34 @@ function FileDetailsPage() {
                 </button>
               </div>
             </div>
-
-            {isSigned && (
-              <div className="signature-info-section">
-                <h3>Signature Information</h3>
-                <div className="sig-info-item">
-                  <div className="sig-info-label">Status</div>
-                  <div className="sig-info-value"><span className="sig-status-badge">SIGNED</span></div>
-                </div>
-                <div className="sig-info-item">
-                  <div className="sig-info-label">Signer</div>
-                  <div className="sig-info-value">{signature.signerName}</div>
-                </div>
-                <div className="sig-info-item">
-                  <div className="sig-info-label">Meaning</div>
-                  <div className="sig-info-value">{signature.meaning}</div>
-                </div>
-                <div className="sig-info-item">
-                  <div className="sig-info-label">Signed At</div>
-                  <div className="sig-info-value">{new Date(signature.timestamp).toLocaleString()}</div>
-                </div>
-                <div className="sig-info-item">
-                  <div className="sig-info-label">Signature ID</div>
-                  <div className="sig-info-value sig-mono">{signature.signatureId}</div>
-                </div>
-                <div className="sig-info-item">
-                  <div className="sig-info-label">Dataset Version</div>
-                  <div className="sig-info-value">{signature.datasetVersion}</div>
-                </div>
-
-                <div className="sig-actions">
-                  <button className="sig-action-btn" onClick={handleVerifyIntegrity} disabled={verifying}>
-                    {verifying ? 'Verifying...' : 'Verify Integrity'}
-                  </button>
-                  <button className="sig-action-btn sig-action-secondary" onClick={() => navigate('/apps/cro-data-review/report/latest')}>
-                    View Signed Report
-                  </button>
-                  <button className="sig-action-btn sig-action-secondary" onClick={() => navigate('/audit-trail')}>
-                    View Audit Trail
-                  </button>
-                </div>
-
-                {integrityResult && (
-                  <div className={`integrity-result integrity-${integrityResult.status.toLowerCase()}`}>
-                    <div className="integrity-header">
-                      {integrityResult.status === 'PASS' ? '\u2713' : '\u2717'} Integrity Check: {integrityResult.status}
-                    </div>
-                    <ul className="integrity-checks">
-                      {integrityResult.checks.map((check, i) => (
-                        <li key={i} className={`integrity-check-${check.status.toLowerCase()}`}>
-                          <strong>{check.name}</strong>: {check.detail}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="integrity-timestamp">
-                      Checked at {new Date(integrityResult.checkedAt).toLocaleString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           <div className="file-details-right">
             <div className="preview-section">
               <div className="preview-header">
                 <div className="preview-actions">
-                  <button className="preview-action-btn">
-                    <OpenIcon />
-                    <span>Open</span>
-                  </button>
+                  <div className="open-dropdown-container" ref={openDropdownRef}>
+                    <button className="preview-action-btn" onClick={() => setIsOpenDropdownOpen(!isOpenDropdownOpen)}>
+                      <OpenIcon />
+                      <span>Open</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px' }}>
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </button>
+                    {isOpenDropdownOpen && (
+                      <div className="open-dropdown">
+                        <button className="open-dropdown-item" onClick={() => { navigate('/apps/hic-qc'); setIsOpenDropdownOpen(false); }}>
+                          HIC QC Data
+                        </button>
+                        <button className="open-dropdown-item" onClick={() => { navigate('/apps/cro-data-review'); setIsOpenDropdownOpen(false); }}>
+                          CRO Data Review
+                        </button>
+                        <button className="open-dropdown-item" onClick={() => { navigate(`/apps/esign/${id}`); setIsOpenDropdownOpen(false); }}>
+                          eSignature
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <button className="preview-action-btn">
                     <BookmarkIcon />
                     <span>Bookmark</span>

@@ -65,3 +65,7 @@ button:focus,
 button:focus-visible {
   outline: none;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

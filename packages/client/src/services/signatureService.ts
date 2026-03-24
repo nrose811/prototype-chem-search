@@ -4,14 +4,16 @@
 
 import {
   DEMO_USER,
-  DEMO_PASSWORD,
   SignatureRecord,
   SignatureMeaning,
 } from '../mocks/demoData';
 
 export interface SignatureRequest {
   userId: string;
-  password: string;
+  /** Token returned by the AuthProvider after re-authentication. */
+  authToken: string;
+  /** Human-readable auth method label, e.g. "Username + Password" or "SSO – Okta (OIDC)". */
+  authMethod: string;
   meaning: SignatureMeaning;
   batchId: string;
   datasetVersion: string;
@@ -30,20 +32,20 @@ export interface SignatureFailure {
 export type SignatureResult = SignatureSuccess | SignatureFailure;
 
 /**
- * Simulate a signature submission with a short delay.
- * Valid credentials: DEMO_USER.userId + DEMO_PASSWORD
+ * Create a signed record after the caller has already authenticated
+ * via an AuthProvider. The token is validated server-side in production;
+ * here we just verify it is non-empty.
  */
 export async function submitSignature(
   request: SignatureRequest,
 ): Promise<SignatureResult> {
   // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, 1200));
+  await new Promise((resolve) => setTimeout(resolve, 400));
 
-  // Validate credentials
-  if (request.userId !== DEMO_USER.userId || request.password !== DEMO_PASSWORD) {
+  if (!request.authToken) {
     return {
       ok: false,
-      error: 'Authentication failed. Please verify your credentials and try again.',
+      error: 'Missing authentication token. Please re-authenticate and try again.',
     };
   }
 
@@ -56,7 +58,7 @@ export async function submitSignature(
     timestamp: now.toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     meaning: request.meaning,
-    authenticationMethod: 'Username + Password',
+    authenticationMethod: request.authMethod,
     datasetVersion: request.datasetVersion,
     reportId: `rpt-${request.batchId}-${Date.now()}`,
     status: 'APPLIED',

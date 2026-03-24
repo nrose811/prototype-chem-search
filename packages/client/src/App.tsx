@@ -21,7 +21,10 @@ import HicQcSampleSelectionPage from './pages/HicQcSampleSelectionPage';
 import HicQcDetailsPage from './pages/HicQcDetailsPage';
 import HicQcSummaryPage from './pages/HicQcSummaryPage';
 import HicQcSignedReportPage from './pages/HicQcSignedReportPage';
+import ESignAppPage from './pages/ESignAppPage';
+import SsoCallbackPage from './pages/SsoCallbackPage';
 import { HicNavigationProvider } from './contexts/HicNavigationContext';
+import { AuthProviderProvider } from './contexts/AuthProviderContext';
 
 function AppRoutes() {
   const { userMode } = useUserMode();
@@ -30,6 +33,9 @@ function AppRoutes() {
     <Routes>
       {/* Persona selection route */}
       <Route path="/select-persona" element={<PersonaSelectPage />} />
+
+      {/* SSO callback (runs inside a popup — no layout wrapper) */}
+      <Route path="/auth/sso-callback" element={<SsoCallbackPage />} />
 
       {/* IT Admin routes */}
       {userMode === 'it' && (
@@ -53,6 +59,8 @@ function AppRoutes() {
           <Route path="apps/hic-qc/details" element={<HicNavigationProvider><HicQcDetailsPage /></HicNavigationProvider>} />
           <Route path="apps/hic-qc/summary" element={<HicNavigationProvider><HicQcSummaryPage /></HicNavigationProvider>} />
           <Route path="apps/hic-qc/report/:reportId" element={<HicQcSignedReportPage />} />
+          <Route path="apps/esign" element={<ESignAppPage />} />
+          <Route path="apps/esign/:fileId" element={<ESignAppPage />} />
           <Route path="audit-trail" element={<AuditTrailPage />} />
           <Route path="visualize" element={<VisualizePage />} />
           <Route path="upload" element={<UploadPage />} />
@@ -73,9 +81,11 @@ function AppRoutes() {
 function App() {
   return (
     <UserModeProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <AuthProviderProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProviderProvider>
     </UserModeProvider>
   );
 }

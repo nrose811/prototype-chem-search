@@ -18,9 +18,11 @@ import {
   recordSignatureFailed,
   AuditContext,
 } from '../services/auditService';
+import { AuthProvider } from '../services/authProvider';
+import { useAuthProvider } from '../contexts/AuthProviderContext';
 import './SignatureWidget.css';
 
-type WidgetState = 'idle' | 'validating' | 'success' | 'error';
+type WidgetState = 'idle' | 'authenticating' | 'validating' | 'success' | 'error';
 
 interface SignatureWidgetProps {
   batchId: string;
@@ -29,6 +31,8 @@ interface SignatureWidgetProps {
   onClose: () => void;
   /** Optional audit context for non-CRO apps (HIC QC, etc.) */
   auditContext?: AuditContext;
+  /** Override the context-level auth provider for this widget instance. */
+  authProvider?: AuthProvider;
 }
 
 export default function SignatureWidget({
@@ -37,26 +41,70 @@ export default function SignatureWidget({
   onSuccess,
   onClose,
   auditContext,
+  authProvider: authProviderProp,
 }: SignatureWidgetProps) {
+  const { authProvider: contextProvider } = useAuthProvider();
+  const provider = authProviderProp ?? contextProvider;
   const [meaning, setMeaning] = useState<SignatureMeaning>(SIGNATURE_MEANINGS[0]);
   const [password, setPassword] = useState('');
   const [state, setState] = useState<WidgetState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [ssoAuthenticated, setSsoAuthenticated] = useState(false);
+  const [authToken, setAuthToken] = useState('');
+  const [authMethod, setAuthMethod] = useState('');
+
+  const handleSsoAuth = async () => {
+    setState('authenticating');
+    setErrorMsg('');
+    const authResult = await provider.reauthenticate(DEMO_USER.userId);
+    if (authResult.ok) {
+      setAuthToken(authResult.token);
+      setAuthMethod(authResult.method);
+      setSsoAuthenticated(true);
+      setState('idle');
+    } else {
+      setErrorMsg(authResult.error);
+      setState('error');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password.trim()) {
-      setErrorMsg('Password is required.');
-      setState('error');
-      return;
-    }
 
-    setState('validating');
-    setErrorMsg('');
+    let token = authToken;
+    let method = authMethod;
+
+    if (provider.type === 'password') {
+      if (!password.trim()) {
+        setErrorMsg('Password is required.');
+        setState('error');
+        return;
+      }
+      setState('validating');
+      setErrorMsg('');
+      const authResult = await provider.reauthenticate(DEMO_USER.userId, password);
+      if (!authResult.ok) {
+        recordSignatureFailed(batchId, datasetVersion, authResult.error, auditContext);
+        setErrorMsg(authResult.error);
+        setState('error');
+        return;
+      }
+      token = authResult.token;
+      method = authResult.method;
+    } else {
+      if (!ssoAuthenticated || !token) {
+        setErrorMsg('Please authenticate via SSO first.');
+        setState('error');
+        return;
+      }
+      setState('validating');
+      setErrorMsg('');
+    }
 
     const result: SignatureResult = await submitSignature({
       userId: DEMO_USER.userId,
-      password,
+      authToken: token,
+      authMethod: method,
       meaning,
       batchId,
       datasetVersion,
@@ -65,7 +113,6 @@ export default function SignatureWidget({
     if (result.ok) {
       recordSignatureApplied(result.signature, auditContext);
       setState('success');
-      // Brief pause so the user sees the success state
       setTimeout(() => onSuccess(result.signature), 900);
     } else {
       const errorText = (result as { ok: false; error: string }).error;
@@ -120,18 +167,41 @@ export default function SignatureWidget({
               />
             </div>
 
-            <div className="sig-field">
-              <label htmlFor="sig-password">Password</label>
-              <input
-                id="sig-password"
-                type="password"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); if (state === 'error') setState('idle'); }}
-                placeholder="Enter your password"
-                disabled={state === 'validating'}
-                autoFocus
-              />
-            </div>
+            {provider.type === 'password' ? (
+              <div className="sig-field">
+                <label htmlFor="sig-password">Password</label>
+                <input
+                  id="sig-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); if (state === 'error') setState('idle'); }}
+                  placeholder="Enter your password"
+                  disabled={state === 'validating'}
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <div className="sig-field">
+                <label>Authentication</label>
+                {ssoAuthenticated ? (
+                  <div className="sig-sso-authenticated">
+                    <span className="sig-sso-check">&#10003;</span>
+                    <span>Authenticated via {provider.label}</span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="sig-sso-btn"
+                    onClick={handleSsoAuth}
+                    disabled={state === 'authenticating'}
+                  >
+                    {state === 'authenticating'
+                      ? `Waiting for ${provider.label}...`
+                      : `Authenticate with ${provider.label}`}
+                  </button>
+                )}
+              </div>
+            )}
 
             {state === 'error' && <div className="sig-error">{errorMsg}</div>}
 
@@ -140,14 +210,14 @@ export default function SignatureWidget({
                 type="button"
                 className="sig-cancel"
                 onClick={onClose}
-                disabled={state === 'validating'}
+                disabled={state === 'validating' || state === 'authenticating'}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="sig-submit"
-                disabled={state === 'validating'}
+                disabled={state === 'validating' || state === 'authenticating' || (provider.type === 'sso' && !ssoAuthenticated)}
               >
                 {state === 'validating' ? 'Verifying...' : 'Apply Signature'}
               </button>

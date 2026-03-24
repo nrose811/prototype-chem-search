@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import './Toolbar.css';
 import { useUserMode } from '../contexts/UserModeContext';
+import { useAuthProvider } from '../contexts/AuthProviderContext';
 
 const pageTitles: Record<string, string> = {
   '/': 'Home',
@@ -22,6 +23,7 @@ interface ToolbarProps {
 function Toolbar({ isSidebarCollapsed, onToggleSidebar }: ToolbarProps) {
   const location = useLocation();
   const { userMode, toggleUserMode } = useUserMode();
+  const { authMode, setAuthMode } = useAuthProvider();
 
   // Get the page title, checking for dynamic routes
   let title = pageTitles[location.pathname];
@@ -169,6 +171,16 @@ function Toolbar({ isSidebarCollapsed, onToggleSidebar }: ToolbarProps) {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
                   Switch to {userMode === 'scientist' ? 'IT' : 'Scientist'} Mode
+                </button>
+                <div className="account-dropdown-divider"></div>
+                <button className="account-dropdown-item" onClick={() => {
+                  setAuthMode(authMode === 'password' ? 'sso' : 'password');
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  {authMode === 'password' ? 'Enable' : 'Disable'} SSO Signing
                 </button>
                 <div className="account-dropdown-divider"></div>
                 <button className="account-dropdown-item" onClick={() => console.log('Logout clicked')}>

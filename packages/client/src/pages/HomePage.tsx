@@ -28,6 +28,12 @@ const ExcelIcon = () => (
   </svg>
 );
 
+const PdfIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="#e74c3c">
+    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM9 13h1.5c.83 0 1.5.67 1.5 1.5S11.33 16 10.5 16H10v1.5H9V13zm5 0h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H15v1.5h-1V13z" />
+  </svg>
+);
+
 const GridIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
     <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z" />
@@ -40,11 +46,6 @@ const MoreIcon = () => (
   </svg>
 );
 
-const ClipboardIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
-  </svg>
-);
 
 interface CardItem {
   icon: JSX.Element;
@@ -54,22 +55,13 @@ interface CardItem {
 }
 
 function HomePage() {
-  const pendingReviews: CardItem[] = [
+  const recommendedApps: CardItem[] = [
     {
-      icon: <ClipboardIcon />,
-      title: 'CRO Alpha — Batch 42',
-      subtitle: 'Pending Signature · 4 files · Received Mar 15',
-      link: '/apps/cro-data-review',
-    },
-    {
-      icon: <ClipboardIcon />,
-      title: 'HIC QC — mAb-A Lot 2026-03',
-      subtitle: 'Pending QC Review · 3 sample sets · Received Mar 17',
+      icon: <StarIcon />,
+      title: 'HIC QC',
+      subtitle: 'v1.0',
       link: '/apps/hic-qc',
     },
-  ];
-
-  const recommendedApps: CardItem[] = [
     {
       icon: <StarIcon />,
       title: 'Chromatography insights',
@@ -109,6 +101,12 @@ function HomePage() {
   ];
 
   const recentData: CardItem[] = [
+    {
+      icon: <PdfIcon />,
+      title: 'CRO-Data-Review-Signed-Report-Batch42.pdf',
+      subtitle: 'GxP Signed Report · Today',
+      link: '/apps/cro-data-review/report/rpt-batch-042-1710700800000',
+    },
     {
       icon: <FileIcon />,
       title: 'CRO-Alpha-Potency-Assay-Batch42.json',
@@ -177,7 +175,7 @@ function HomePage() {
       <h1 className="welcome-title">Welcome, Marie Curie!</h1>
 
       <div className="home-sections">
-        {renderSection('Pending reviews', pendingReviews, '/apps/cro-data-review')}
+        {renderSection('Saved searches', savedSearches, '/search')}
         {renderSection('Recommended apps', recommendedApps, '/apps')}
         {renderSection('Recent data', recentData, '/data-table')}
       </div>

@@ -11,7 +11,21 @@ function SignedReportPage() {
   const generatedDate = new Date(generatedAt);
 
   return (
-    <div className="signed-report-page">
+    <div className="signed-report-canvas">
+      {/* ---- PDF Toolbar ---- */}
+      <div className="pdf-toolbar">
+        <div className="pdf-toolbar-left">
+          <span className="pdf-icon">PDF</span>
+          <span>CRO-Data-Review-Signed-Report-{reportId}.pdf</span>
+        </div>
+        <div className="pdf-toolbar-right">
+          <button onClick={() => navigate('/apps/cro-data-review')}>Back to Review</button>
+          <button onClick={() => navigate('/audit-trail')}>Audit Trail</button>
+          <button onClick={() => window.print()}>🖨 Print</button>
+        </div>
+      </div>
+
+      <div className="signed-report-page">
       {/* ---- Report Banner ---- */}
       <div className="report-banner">
         <div className="report-banner-badge">Certified Copy</div>
@@ -179,17 +193,6 @@ function SignedReportPage() {
         <p>Report ID: {reportId} &bull; Dataset Version: {batch.datasetVersion}</p>
       </div>
 
-      {/* ---- Actions (hidden in print) ---- */}
-      <div className="report-actions">
-        <button className="report-btn-secondary" onClick={() => navigate('/apps/cro-data-review')}>
-          Back to Review
-        </button>
-        <button className="report-btn-secondary" onClick={() => navigate('/audit-trail')}>
-          View Audit Trail
-        </button>
-        <button className="report-btn-primary" onClick={() => window.print()}>
-          Print Report
-        </button>
       </div>
     </div>
   );

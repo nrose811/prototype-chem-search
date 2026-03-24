@@ -111,6 +111,17 @@ function AppsPage() {
       isFavorite: true,
     },
     {
+      id: 'esign',
+      icon: <ClipboardCheckIcon />,
+      title: 'eSignature',
+      description: 'Review source data alongside parsed results and apply 21 CFR Part 11 compliant e-signatures',
+      version: 'v1.0.0',
+      buttonText: 'OPEN',
+      buttonVariant: 'primary',
+      category: ['All Apps', 'Data', 'Featured'],
+      isFavorite: true,
+    },
+    {
       id: '4',
       icon: <LineageIcon />,
       title: 'Lineage Explorer',
@@ -239,6 +250,8 @@ function AppsPage() {
                     navigate('/apps/cro-data-review');
                   } else if (app.id === 'hic-qc') {
                     navigate('/apps/hic-qc');
+                  } else if (app.id === 'esign') {
+                    navigate('/apps/esign');
                   }
                 }}
               >
