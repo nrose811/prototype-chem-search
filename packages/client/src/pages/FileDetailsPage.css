@@ -447,6 +447,14 @@
   overflow: auto;
 }
 
+.signed-file-report-preview {
+  padding: 4px 0;
+}
+
+.signed-file-report-preview .report-header h1 {
+  font-size: 18px;
+}
+
 .document-layout.with-assistant .preview-content {
   border-right: 1px solid var(--border-color);
 }

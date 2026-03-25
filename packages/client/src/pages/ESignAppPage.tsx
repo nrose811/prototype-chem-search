@@ -65,7 +65,7 @@ function ESignAppPage() {
     setStatus('signed');
     setLastSignature(signature);
     setShowSignModal(false);
-    createReport(signature);
+    createReport(signature, DEMO_BATCH);
     // Pin the current file version in the esign_manifest label
     if (file) {
       setEsignManifest({ version: file.versionId, status: 'signed', timestamp: signature.timestamp });
@@ -158,7 +158,7 @@ function ESignAppPage() {
             <strong>Signed by {lastSignature.signerName}</strong>
             <span>{new Date(lastSignature.timestamp).toLocaleString()} — {lastSignature.meaning}</span>
           </div>
-          <button className="esign-view-report-btn" onClick={() => navigate(`/apps/cro-data-review/report/${DEMO_BATCH.batchId}`)}>
+          <button className="esign-view-report-btn" onClick={() => navigate(`/apps/cro-data-review/report/${lastSignature.reportId}`)}>
             View Signed Report
           </button>
         </div>

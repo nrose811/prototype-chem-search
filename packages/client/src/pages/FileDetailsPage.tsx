@@ -1,6 +1,7 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import './FileDetailsPage.css';
+import './SignedReportPage.css';
 import SpreadsheetViewer, { SpreadsheetData } from '../components/SpreadsheetViewer';
 import FileAssistant from '../components/FileAssistant';
 import { DEMO_BATCH, DEMO_USER, SignatureRecord, findDemoFile } from '../mocks/demoData';
@@ -110,6 +111,75 @@ const AIAssistantIcon = () => (
   </svg>
 );
 
+interface AssayRow { sample: string; analyte: string; result: string; unit: string; spec: string; status: 'Pass' | 'Fail'; }
+
+function getMockAssayResults(assayType: string): AssayRow[] {
+  switch (assayType) {
+    case 'Potency':
+      return [
+        { sample: 'S-01', analyte: 'Active Compound A', result: '99.2', unit: '%', spec: '95.0–105.0%', status: 'Pass' },
+        { sample: 'S-02', analyte: 'Active Compound A', result: '98.7', unit: '%', spec: '95.0–105.0%', status: 'Pass' },
+        { sample: 'S-03', analyte: 'Active Compound A', result: '100.1', unit: '%', spec: '95.0–105.0%', status: 'Pass' },
+      ];
+    case 'Purity':
+      return [
+        { sample: 'S-01', analyte: 'Main Peak', result: '99.6', unit: '%', spec: '>= 98.0%', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Impurity B', result: '0.12', unit: '%', spec: '<= 0.5%', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Total Impurities', result: '0.35', unit: '%', spec: '<= 2.0%', status: 'Pass' },
+      ];
+    case 'Identity':
+      return [
+        { sample: 'S-01', analyte: 'MW Confirmation', result: '384.2', unit: 'Da', spec: '384.2 ± 0.5 Da', status: 'Pass' },
+        { sample: 'S-01', analyte: 'UV Max', result: '268', unit: 'nm', spec: '268 ± 2 nm', status: 'Pass' },
+      ];
+    case 'Stability':
+      return [
+        { sample: 'S-01', analyte: 'Active Compound A (T=0)', result: '99.5', unit: '%', spec: '>= 95.0%', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Active Compound A (T=3mo)', result: '98.8', unit: '%', spec: '>= 95.0%', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Active Compound A (T=6mo)', result: '97.4', unit: '%', spec: '>= 95.0%', status: 'Pass' },
+      ];
+    case 'Dissolution':
+      return [
+        { sample: 'S-01', analyte: 'Dissolved at 15 min', result: '72', unit: '%', spec: '>= 70%', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Dissolved at 30 min', result: '89', unit: '%', spec: '>= 85%', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Dissolved at 45 min', result: '96', unit: '%', spec: '>= 90%', status: 'Pass' },
+      ];
+    case 'Content Uniformity':
+      return [
+        { sample: 'T-01', analyte: 'Content', result: '100.2', unit: '%', spec: '85.0–115.0%', status: 'Pass' },
+        { sample: 'T-02', analyte: 'Content', result: '98.7', unit: '%', spec: '85.0–115.0%', status: 'Pass' },
+        { sample: 'T-03', analyte: 'Content', result: '101.5', unit: '%', spec: '85.0–115.0%', status: 'Pass' },
+        { sample: 'RSD', analyte: 'RSD', result: '1.4', unit: '%', spec: '<= 6.0%', status: 'Pass' },
+      ];
+    case 'Residual Solvents':
+      return [
+        { sample: 'S-01', analyte: 'Methanol', result: '24', unit: 'ppm', spec: '<= 3000 ppm', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Ethanol', result: '45', unit: 'ppm', spec: '<= 5000 ppm', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Acetonitrile', result: '18', unit: 'ppm', spec: '<= 410 ppm', status: 'Pass' },
+      ];
+    case 'Water Content':
+      return [
+        { sample: 'S-01', analyte: 'Water (KF Titration)', result: '0.42', unit: '%', spec: '<= 1.0%', status: 'Pass' },
+        { sample: 'S-02', analyte: 'Water (KF Titration)', result: '0.38', unit: '%', spec: '<= 1.0%', status: 'Pass' },
+      ];
+    case 'Particle Size':
+      return [
+        { sample: 'S-01', analyte: 'D10', result: '12.3', unit: 'µm', spec: '5–25 µm', status: 'Pass' },
+        { sample: 'S-01', analyte: 'D50', result: '48.7', unit: 'µm', spec: '30–70 µm', status: 'Pass' },
+        { sample: 'S-01', analyte: 'D90', result: '124.5', unit: 'µm', spec: '80–200 µm', status: 'Pass' },
+      ];
+    case 'Sterility':
+      return [
+        { sample: 'S-01', analyte: 'Bacterial Endotoxins', result: '< 0.05', unit: 'EU/mL', spec: '<= 0.5 EU/mL', status: 'Pass' },
+        { sample: 'S-01', analyte: 'Bioburden', result: '< 1', unit: 'CFU/mL', spec: '< 10 CFU/mL', status: 'Pass' },
+      ];
+    default:
+      return [
+        { sample: 'S-01', analyte: assayType, result: '98.5', unit: '%', spec: '>= 95.0%', status: 'Pass' },
+      ];
+  }
+}
+
 function FileDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -135,10 +205,22 @@ function FileDetailsPage() {
   const batchFile = DEMO_BATCH.files.find((f) => f.fileId === id);
   // Also look up from the broader demo file set (unsigned, signed, reports)
   const demoFile = batchFile || findDemoFile(id || '');
-  // Show signed state only for batch files (pre-signed or live-signed)
-  const isSigned = !!(batchFile);
-  // Use the report signature but reflect the current auth method for demo data
-  const signature: SignatureRecord = {
+  // Show signed state for batch files (pre-signed or live-signed) OR any file with an esignManifest
+  const isSigned = !!(batchFile) || !!(demoFile?.esignManifest);
+  // Build signature: use esignManifest data for standalone signed files, report signature for batch files
+  const signature: SignatureRecord = (demoFile?.esignManifest && !batchFile) ? {
+    signatureId: `sig-${demoFile.fileId}`,
+    signerId: DEMO_USER.userId,
+    signerName: DEMO_USER.name,
+    timestamp: demoFile.esignManifest.timestamp,
+    timezone: 'EST',
+    meaning: 'Review and Approval',
+    authenticationMethod: authProvider.type === 'sso' ? `SSO – ${authProvider.label} (OIDC)` : 'Username + Password',
+    datasetVersion: demoFile.versionId,
+    reportId: `rpt-${demoFile.fileId}`,
+    status: 'APPLIED',
+    batchId: '',
+  } : {
     ...report.signature,
     authenticationMethod: report.signature.authenticationMethod === 'Username + Password' && authProvider.type === 'sso'
       ? `SSO – ${authProvider.label} (OIDC)`
@@ -443,7 +525,142 @@ function FileDetailsPage() {
               ) : (
               <div className={`document-layout${showAIAssistant ? ' with-assistant' : ''}`}>
                 <div className="preview-content">
-                  {!fileData.sourceLocation.includes('chromatography') ? (
+                  {demoFile?.fileType === 'pdf' && demoFile?.signedFileId ? (() => {
+                    const parentFile = findDemoFile(demoFile.signedFileId!);
+                    const manifest = parentFile?.esignManifest;
+                    if (!manifest || !parentFile) return null;
+                    const reportId = `rpt-${demoFile.fileId}`;
+                    const signedDate = new Date(manifest.timestamp);
+                    const assayRows = getMockAssayResults(demoFile.assayType);
+                    const reportSignature = {
+                      signatureId: `sig-${parentFile.fileId}`,
+                      signerId: DEMO_USER.userId,
+                      signerName: DEMO_USER.name,
+                      meaning: 'Review and Approval' as const,
+                      authenticationMethod: 'Username + Password',
+                    };
+                    return (
+                      <div className="signed-file-report-preview">
+                        {/* Header */}
+                        <div className="report-header">
+                          <div className="report-title-row">
+                            <h1>eSignature Report &mdash; {demoFile.assayType}</h1>
+                          </div>
+                          <div className="report-meta-row">
+                            <span>Report ID: <strong>{reportId}</strong></span>
+                            <span>Generated: <strong>{signedDate.toLocaleString()}</strong></span>
+                          </div>
+                        </div>
+                        {/* File Info */}
+                        <div className="report-section">
+                          <h2>File Summary</h2>
+                          <div className="report-grid">
+                            <div className="report-field">
+                              <span className="report-label">Source File</span>
+                              <span className="report-value">{parentFile.fileName}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Assay Type</span>
+                              <span className="report-value">{demoFile.assayType}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Source System</span>
+                              <span className="report-value">{parentFile.sourceSystem}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Version</span>
+                              <span className="report-value">{parentFile.versionId}</span>
+                            </div>
+                            <div className="report-field full-width">
+                              <span className="report-label">SHA-256 Hash</span>
+                              <span className="report-value hash">{parentFile.sha256}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Assay Results */}
+                        <div className="report-section">
+                          <h2>Assay Results</h2>
+                          <table className="report-table">
+                            <thead>
+                              <tr>
+                                <th>Sample</th>
+                                <th>Analyte</th>
+                                <th>Result</th>
+                                <th>Unit</th>
+                                <th>Specification</th>
+                                <th>Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {assayRows.map((r, idx) => (
+                                <tr key={idx}>
+                                  <td>{r.sample}</td>
+                                  <td>{r.analyte}</td>
+                                  <td>{r.result}</td>
+                                  <td>{r.unit}</td>
+                                  <td>{r.spec}</td>
+                                  <td>
+                                    <span className={`report-result-status ${r.status.toLowerCase()}`}>{r.status}</span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <p className="report-result-summary">
+                            {assayRows.length} results &mdash; {assayRows.filter(r => r.status === 'Pass').length} passed,{' '}
+                            {assayRows.filter(r => r.status === 'Fail').length} failed
+                          </p>
+                        </div>
+                        {/* Signature Block */}
+                        <div className="report-section report-signature-block">
+                          <h2>Electronic Signature</h2>
+                          <div className="report-grid">
+                            <div className="report-field">
+                              <span className="report-label">Signer</span>
+                              <span className="report-value">{reportSignature.signerName}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">User ID</span>
+                              <span className="report-value">{reportSignature.signerId}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Role</span>
+                              <span className="report-value">{DEMO_USER.role}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Organization</span>
+                              <span className="report-value">{DEMO_USER.organization}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Meaning of Signature</span>
+                              <span className="report-value report-meaning">{reportSignature.meaning}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Authentication Method</span>
+                              <span className="report-value">{reportSignature.authenticationMethod}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Date &amp; Time</span>
+                              <span className="report-value">{signedDate.toLocaleDateString()} {signedDate.toLocaleTimeString()}</span>
+                            </div>
+                            <div className="report-field">
+                              <span className="report-label">Dataset Version</span>
+                              <span className="report-value">{manifest.version}</span>
+                            </div>
+                            <div className="report-field full-width">
+                              <span className="report-label">Signature ID</span>
+                              <span className="report-value hash">{reportSignature.signatureId}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Footer */}
+                        <div className="report-footer">
+                          <p>This report was electronically generated and signed via the TetraScience Data Platform.</p>
+                          <p>Report ID: {reportId} &bull; Dataset Version: {manifest.version}</p>
+                        </div>
+                      </div>
+                    );
+                  })() : !fileData.sourceLocation.includes('chromatography') ? (
                     <>
                       <button className="preview-copy-btn" onClick={() => handleCopy('Proteomics-Study3-Protocol.txt', 'preview-copy')}>
                         {copiedId === 'preview-copy' ? <CheckIcon /> : <CopyIcon />}

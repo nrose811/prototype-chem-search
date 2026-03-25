@@ -95,7 +95,7 @@ function HomePage() {
       searchCategory: 'signed',
     },
     {
-      icon: <PdfIcon />,
+      icon: <SearchIcon />,
       title: 'eSignature Reports',
       subtitle: '10 reports',
       searchCategory: 'reports',
@@ -109,18 +109,6 @@ function HomePage() {
   ];
 
   const recentData: CardItem[] = [
-    {
-      icon: <PdfIcon />,
-      title: 'CRO-Data-Review-Signed-Report-Batch42.pdf',
-      subtitle: 'GxP Signed Report · Today',
-      link: '/apps/cro-data-review/report/rpt-batch-042-1710700800000',
-    },
-    {
-      icon: <FileIcon />,
-      title: 'CRO-Alpha-Potency-Assay-Batch42.json',
-      subtitle: 'GxP Signed · Today',
-      link: '/details/file-001',
-    },
     {
       icon: <GridIcon />,
       title: 'Data set',
