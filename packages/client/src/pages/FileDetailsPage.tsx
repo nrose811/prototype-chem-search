@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import './FileDetailsPage.css';
 import SpreadsheetViewer, { SpreadsheetData } from '../components/SpreadsheetViewer';
 import FileAssistant from '../components/FileAssistant';
-import { DEMO_BATCH, DEMO_USER, SignatureRecord } from '../mocks/demoData';
+import { DEMO_BATCH, DEMO_USER, SignatureRecord, findDemoFile } from '../mocks/demoData';
 import { getReport } from '../services/reportService';
 import { useAuthProvider } from '../contexts/AuthProviderContext';
 
@@ -132,9 +132,11 @@ function FileDetailsPage() {
   }, []);
   // Check if this file is part of the signed batch
   const report = getReport();
-  const demoFile = DEMO_BATCH.files.find((f) => f.fileId === id);
-  // Show signed state for demo batch files (pre-signed or live-signed)
-  const isSigned = !!(demoFile);
+  const batchFile = DEMO_BATCH.files.find((f) => f.fileId === id);
+  // Also look up from the broader demo file set (unsigned, signed, reports)
+  const demoFile = batchFile || findDemoFile(id || '');
+  // Show signed state only for batch files (pre-signed or live-signed)
+  const isSigned = !!(batchFile);
   // Use the report signature but reflect the current auth method for demo data
   const signature: SignatureRecord = {
     ...report.signature,

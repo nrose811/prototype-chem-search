@@ -1,8 +1,9 @@
 import CustomTable, { TableColumn } from '../components/CustomTable';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import FilterCard, { FilterCardRef } from '../components/FilterCard';
 import SearchAssistant from '../components/SearchAssistant';
+import { getAllUnsignedFiles, getAllSignedFiles, getAllReportFiles, type DemoFile } from '../mocks/demoData';
 import './SearchResultsPage.css';
 
 interface SearchResult {
@@ -576,13 +577,27 @@ function SearchResultsPage() {
   const initialSearchType = (location.state as { searchType?: 'proteomics' | 'chromatography' })?.searchType || 'proteomics';
   const [currentSearchType, setCurrentSearchType] = useState<'proteomics' | 'chromatography'>(initialSearchType);
   const [searchQuery, setSearchQuery] = useState(
-    initialSearchType === 'chromatography'
-      ? 'All chromatography data for the last 2 weeks'
+    (location.state as any)?.searchCategory === 'unsigned' ? 'Files without signature' :
+    (location.state as any)?.searchCategory === 'signed' ? 'GxP Signed files' :
+    (location.state as any)?.searchCategory === 'reports' ? 'eSignature Reports' :
+    initialSearchType === 'chromatography' ? 'All chromatography data for the last 2 weeks'
       : 'All data for proteomics study 3'
   );
 
-  // Get current results based on search type
-  const currentResults = currentSearchType === 'chromatography' ? chromatographyResults : searchResults;
+  const searchCategory = (location.state as { searchCategory?: string })?.searchCategory || null;
+  const demoToResult = (f: DemoFile): SearchResult => ({
+    id: f.fileId, name: f.fileName,
+    sourceLocation: `/${f.sourceSystem.toLowerCase().replace(/ /g, '-')}`,
+    uploadedAt: new Date(f.uploadedAt).toLocaleDateString(),
+    uploadedAtRelative: '', fileType: 'document',
+  });
+  const demoResults = useMemo(() => {
+    if (searchCategory === 'unsigned') return getAllUnsignedFiles().map(demoToResult);
+    if (searchCategory === 'signed') return getAllSignedFiles().map(demoToResult);
+    if (searchCategory === 'reports') return getAllReportFiles().map(demoToResult);
+    return null;
+  }, [searchCategory]);
+  const currentResults = demoResults || (currentSearchType === 'chromatography' ? chromatographyResults : searchResults);
 
   // Poll for active filters when assistant is open
   useEffect(() => {

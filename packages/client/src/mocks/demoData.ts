@@ -544,3 +544,104 @@ export const HIC_STANDARD_CHROMATOGRAM: ChromatogramSeries = {
   time: HIC_TIME,
   intensity: buildChromatogram([{ center: 4.5, height: 900, width: 0.55 }, { center: 8.0, height: 80, width: 0.45 }, { center: 12.0, height: 30, width: 0.65 }]),
 };
+
+// ============================================================
+// Search & Demo Data — Unsigned / Signed / Report Files
+// ============================================================
+
+export interface DemoFile {
+  fileId: string;
+  fileName: string;
+  sourceSystem: string;
+  versionId: string;
+  sha256: string;
+  assayType: string;
+  uploadedAt: string;
+  fileType?: 'document' | 'pdf';
+  esignManifest?: { version: string; status: 'signed'; timestamp: string } | null;
+  signedFileId?: string;
+}
+
+function fakeSha(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+  const hex = Math.abs(h).toString(16).padStart(8, '0');
+  return (hex + hex + hex + hex + hex + hex + hex + hex).slice(0, 64);
+}
+
+const SRC_SYS = ['Empower CDS','MassLynx','Chromeleon','UNICORN','LabWare LIMS','NuGenesis','Agilent OpenLab','Thermo Fisher SII'];
+const ASSAYS = ['Potency','Purity','Identity','Stability','Dissolution','Content Uniformity','Residual Solvents','Water Content','Particle Size','Sterility'];
+const BPFX = ['LOT','BN','PROD','QC','REL'];
+
+function buildUnsignedFiles(): DemoFile[] {
+  const files: DemoFile[] = [];
+  for (let i = 1; i <= 100; i++) {
+    const idx = i - 1;
+    const bn = 100 + Math.floor(idx / 4);
+    const pfx = BPFX[idx % BPFX.length];
+    const assay = ASSAYS[idx % ASSAYS.length];
+    const src = SRC_SYS[idx % SRC_SYS.length];
+    const day = 1 + (idx % 28);
+    const mo = 1 + Math.floor(idx / 30) % 3;
+    const pi = String(i).padStart(3, '0');
+    files.push({
+      fileId: `ufile-${pi}`,
+      fileName: `${pfx}-${bn}-${assay.replace(/ /g, '-')}-${pi}.json`,
+      sourceSystem: src,
+      versionId: `v${1 + (idx % 4)}`,
+      sha256: fakeSha(`ufile-${pi}`),
+      assayType: assay,
+      uploadedAt: `2026-0${mo}-${String(day).padStart(2, '0')}T${String(8 + (idx % 10)).padStart(2, '0')}:${String(idx % 60).padStart(2, '0')}:00Z`,
+    });
+  }
+  return files;
+}
+
+export const UNSIGNED_FILES: DemoFile[] = buildUnsignedFiles();
+
+export const SIGNED_FILES: DemoFile[] = [
+  { fileId: 'sfile-001', fileName: 'LOT-200-Potency-Signed.json', sourceSystem: 'Empower CDS', versionId: 'v3', sha256: fakeSha('sfile-001'), assayType: 'Potency', uploadedAt: '2026-01-05T10:00:00Z', esignManifest: { version: 'v3', status: 'signed', timestamp: '2026-01-06T09:30:00Z' } },
+  { fileId: 'sfile-002', fileName: 'BN-201-Purity-Signed.json', sourceSystem: 'MassLynx', versionId: 'v2', sha256: fakeSha('sfile-002'), assayType: 'Purity', uploadedAt: '2026-01-08T11:00:00Z', esignManifest: { version: 'v2', status: 'signed', timestamp: '2026-01-09T14:15:00Z' } },
+  { fileId: 'sfile-003', fileName: 'PROD-202-Identity-Signed.json', sourceSystem: 'Chromeleon', versionId: 'v1', sha256: fakeSha('sfile-003'), assayType: 'Identity', uploadedAt: '2026-01-12T09:00:00Z', esignManifest: { version: 'v1', status: 'signed', timestamp: '2026-01-13T10:00:00Z' } },
+  { fileId: 'sfile-004', fileName: 'QC-203-Stability-Signed.json', sourceSystem: 'UNICORN', versionId: 'v4', sha256: fakeSha('sfile-004'), assayType: 'Stability', uploadedAt: '2026-01-15T08:00:00Z', esignManifest: { version: 'v4', status: 'signed', timestamp: '2026-01-16T11:45:00Z' } },
+  { fileId: 'sfile-005', fileName: 'REL-204-Dissolution-Signed.json', sourceSystem: 'LabWare LIMS', versionId: 'v2', sha256: fakeSha('sfile-005'), assayType: 'Dissolution', uploadedAt: '2026-01-20T14:00:00Z', esignManifest: { version: 'v2', status: 'signed', timestamp: '2026-01-21T16:30:00Z' } },
+  { fileId: 'sfile-006', fileName: 'LOT-205-Content-Uniformity-Signed.json', sourceSystem: 'NuGenesis', versionId: 'v3', sha256: fakeSha('sfile-006'), assayType: 'Content Uniformity', uploadedAt: '2026-02-01T09:00:00Z', esignManifest: { version: 'v3', status: 'signed', timestamp: '2026-02-02T10:15:00Z' } },
+  { fileId: 'sfile-007', fileName: 'BN-206-Residual-Solvents-Signed.json', sourceSystem: 'Agilent OpenLab', versionId: 'v1', sha256: fakeSha('sfile-007'), assayType: 'Residual Solvents', uploadedAt: '2026-02-05T10:00:00Z', esignManifest: { version: 'v1', status: 'signed', timestamp: '2026-02-06T08:00:00Z' } },
+  { fileId: 'sfile-008', fileName: 'PROD-207-Water-Content-Signed.json', sourceSystem: 'Thermo Fisher SII', versionId: 'v2', sha256: fakeSha('sfile-008'), assayType: 'Water Content', uploadedAt: '2026-02-10T11:00:00Z', esignManifest: { version: 'v2', status: 'signed', timestamp: '2026-02-11T13:00:00Z' } },
+  { fileId: 'sfile-009', fileName: 'QC-208-Particle-Size-Signed.json', sourceSystem: 'Empower CDS', versionId: 'v3', sha256: fakeSha('sfile-009'), assayType: 'Particle Size', uploadedAt: '2026-02-15T09:00:00Z', esignManifest: { version: 'v3', status: 'signed', timestamp: '2026-02-16T15:30:00Z' } },
+  { fileId: 'sfile-010', fileName: 'REL-209-Sterility-Signed.json', sourceSystem: 'MassLynx', versionId: 'v1', sha256: fakeSha('sfile-010'), assayType: 'Sterility', uploadedAt: '2026-02-20T08:00:00Z', esignManifest: { version: 'v1', status: 'signed', timestamp: '2026-02-21T09:45:00Z' } },
+];
+
+export const ESIGN_REPORT_FILES: DemoFile[] = SIGNED_FILES.map((sf, i) => ({
+  fileId: `rptfile-${String(i + 1).padStart(3, '0')}`,
+  fileName: `eSignature-Report-${sf.fileName.replace('-Signed.json', '')}.pdf`,
+  sourceSystem: 'eSignature App',
+  versionId: 'v1',
+  sha256: fakeSha(`rptfile-${String(i + 1).padStart(3, '0')}`),
+  assayType: sf.assayType,
+  uploadedAt: sf.esignManifest?.timestamp || sf.uploadedAt,
+  fileType: 'pdf' as const,
+  signedFileId: sf.fileId,
+}));
+
+export const runtimeSignedFiles: DemoFile[] = [];
+export const runtimeReportFiles: DemoFile[] = [];
+
+export function getAllUnsignedFiles(): DemoFile[] {
+  const signedIds = new Set(
+    [...SIGNED_FILES, ...runtimeSignedFiles].map(f => f.fileId),
+  );
+  return UNSIGNED_FILES.filter(f => !signedIds.has(f.fileId));
+}
+export function getAllSignedFiles(): DemoFile[] {
+  return [...SIGNED_FILES, ...runtimeSignedFiles];
+}
+export function getAllReportFiles(): DemoFile[] {
+  return [...ESIGN_REPORT_FILES, ...runtimeReportFiles];
+}
+export function findDemoFile(fileId: string): DemoFile | undefined {
+  return [
+    ...UNSIGNED_FILES, ...SIGNED_FILES, ...ESIGN_REPORT_FILES,
+    ...runtimeSignedFiles, ...runtimeReportFiles,
+  ].find(f => f.fileId === fileId);
+}

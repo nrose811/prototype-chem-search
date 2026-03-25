@@ -1,67 +1,13 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { DEMO_BATCH, DEMO_USER, SignatureRecord } from '../mocks/demoData';
-import SpreadsheetViewer, { SpreadsheetData } from '../components/SpreadsheetViewer';
+import { DEMO_BATCH, DEMO_USER, SignatureRecord, findDemoFile } from '../mocks/demoData';
+import SpreadsheetViewer from '../components/SpreadsheetViewer';
 import SignatureWidget from '../components/SignatureWidget';
 import { createReport } from '../services/reportService';
+import { generateSourceData, generateTimelineEvents, TimelineEvent } from '../utils/assayDataGenerators';
 import './ESignAppPage.css';
 
-// ---- Mock "raw source" spreadsheet data keyed by fileId ----
-const SOURCE_DATA: Record<string, SpreadsheetData> = {
-  'file-001': {
-    columns: ['Sample ID', 'Analyte', 'Raw Area', 'Std Area', 'Conc (mg/mL)', 'Assay %', 'Spec', 'Result'],
-    rows: [
-      { rowNumber: 1, cells: [{ value: 'S-042-01' }, { value: 'Active Compound A' }, { value: 524819 }, { value: 529330 }, { value: 9.92 }, { value: 99.2 }, { value: '95.0–105.0%' }, { value: 'Pass' }] },
-      { rowNumber: 2, cells: [{ value: 'S-042-02' }, { value: 'Active Compound A' }, { value: 521450 }, { value: 529330 }, { value: 9.87 }, { value: 98.7 }, { value: '95.0–105.0%' }, { value: 'Pass' }] },
-      { rowNumber: 3, cells: [{ value: 'S-042-03' }, { value: 'Active Compound A' }, { value: 530122 }, { value: 529330 }, { value: 10.01 }, { value: 100.1 }, { value: '95.0–105.0%' }, { value: 'Pass' }] },
-    ],
-  },
-  'file-002': {
-    columns: ['Sample ID', 'Analyte', 'Peak Area', 'RRT', 'Result %', 'Limit', 'Result'],
-    rows: [
-      { rowNumber: 1, cells: [{ value: 'S-042-01' }, { value: 'Impurity B' }, { value: 6210 }, { value: 0.85 }, { value: 0.12 }, { value: '≤ 0.5%' }, { value: 'Pass' }] },
-      { rowNumber: 2, cells: [{ value: 'S-042-02' }, { value: 'Impurity B' }, { value: 4680 }, { value: 0.85 }, { value: 0.09 }, { value: '≤ 0.5%' }, { value: 'Pass' }] },
-      { rowNumber: 3, cells: [{ value: 'S-042-03' }, { value: 'Total Impurities' }, { value: 18120 }, { value: '-' }, { value: 0.35 }, { value: '≤ 2.0%' }, { value: 'Pass' }] },
-    ],
-  },
-  'file-003': {
-    columns: ['Sample ID', 'Analyte', 'Observed m/z', 'Expected m/z', 'Delta (Da)', 'Tolerance', 'Result'],
-    rows: [
-      { rowNumber: 1, cells: [{ value: 'S-042-01' }, { value: 'MW Confirmation' }, { value: 384.21 }, { value: 384.20 }, { value: 0.01 }, { value: '± 0.5 Da' }, { value: 'Pass' }] },
-    ],
-  },
-  'file-004': {
-    columns: ['Sample ID', 'Analyte', 'Time Point', 'Assay %', 'Spec', 'Result'],
-    rows: [
-      { rowNumber: 1, cells: [{ value: 'S-042-01' }, { value: 'Active Compound A' }, { value: 'T=0' }, { value: 99.5 }, { value: '≥ 95.0%' }, { value: 'Pass' }] },
-      { rowNumber: 2, cells: [{ value: 'S-042-01' }, { value: 'Active Compound A' }, { value: 'T=3mo' }, { value: 98.8 }, { value: '≥ 95.0%' }, { value: 'Pass' }] },
-    ],
-  },
-};
 
-interface TimelineEvent { id: string; eventType: string; actor: string; timestamp: string; detail: string; }
-
-const TIMELINE_EVENTS: Record<string, TimelineEvent[]> = {
-  'file-001': [
-    { id: 'tl-1', eventType: 'File Created', actor: 'System Agent', timestamp: '2026-03-15T14:28:00Z', detail: 'Ingested from CRO Alpha pipeline' },
-    { id: 'tl-2', eventType: 'Label Added', actor: 'j.doe@lab.com', timestamp: '2026-03-15T15:02:00Z', detail: 'esign:status set to Pending' },
-    { id: 'tl-3', eventType: 'File Updated', actor: 's.smith@lab.com', timestamp: '2026-03-16T09:45:00Z', detail: 'New Version (v2) Detected' },
-    { id: 'tl-4', eventType: 'Label Changed', actor: 'Integrity-Bot', timestamp: '2026-03-16T09:45:05Z', detail: 'esign:status reset to Pending' },
-    { id: 'tl-5a', eventType: 'E-Signature Applied', actor: 'Dr. Sarah Chen', timestamp: '2026-03-17T10:15:00Z', detail: 'Signed with meaning: "Review and Approval" — Auth: Username + Password' },
-  ],
-  'file-002': [
-    { id: 'tl-5', eventType: 'File Created', actor: 'System Agent', timestamp: '2026-03-15T14:28:30Z', detail: 'Ingested from CRO Alpha pipeline' },
-    { id: 'tl-6', eventType: 'Label Added', actor: 'j.doe@lab.com', timestamp: '2026-03-15T15:03:00Z', detail: 'esign:status set to Pending' },
-  ],
-  'file-003': [
-    { id: 'tl-7', eventType: 'File Created', actor: 'System Agent', timestamp: '2026-03-15T14:29:00Z', detail: 'Ingested from CRO Alpha pipeline' },
-    { id: 'tl-8', eventType: 'Label Added', actor: 'j.doe@lab.com', timestamp: '2026-03-15T15:04:00Z', detail: 'esign:status set to Pending' },
-  ],
-  'file-004': [
-    { id: 'tl-9', eventType: 'File Created', actor: 'System Agent', timestamp: '2026-03-15T14:29:30Z', detail: 'Ingested from CRO Alpha pipeline' },
-    { id: 'tl-10', eventType: 'Label Added', actor: 'j.doe@lab.com', timestamp: '2026-03-15T15:05:00Z', detail: 'esign:status set to Pending' },
-  ],
-};
 
 function fmtTime(iso: string): string {
   const d = new Date(iso);
@@ -96,10 +42,11 @@ function ESignAppPage() {
   const { fileId } = useParams<{ fileId: string }>();
   const navigate = useNavigate();
 
-  // Look up the file from the demo batch
-  const file = DEMO_BATCH.files.find((f) => f.fileId === fileId);
+  // Look up the file from the demo batch, falling back to broader demo data
+  const batchFile = DEMO_BATCH.files.find((f) => f.fileId === fileId);
+  const file = batchFile || (fileId ? findDemoFile(fileId) : undefined);
   const assayResults = DEMO_BATCH.assayResults.filter((r) => r.fileId === fileId);
-  const sourceData = fileId ? SOURCE_DATA[fileId] : undefined;
+  const sourceData = file ? generateSourceData(file) : undefined;
 
   const isPreSigned = fileId === PRE_SIGNED_FILE_ID;
   const [fileIdInput, setFileIdInput] = useState('');
@@ -111,7 +58,8 @@ function ESignAppPage() {
   const [esignManifest, setEsignManifest] = useState<ESignManifest | null>(
     isPreSigned && file ? { version: file.versionId, status: 'signed', timestamp: PRE_SIGNED_SIGNATURE.timestamp } : null
   );
-  const allTimelineEvents = [...(fileId ? TIMELINE_EVENTS[fileId] || [] : []), ...dynamicEvents];
+  const baseTimelineEvents = file ? generateTimelineEvents(file) : [];
+  const allTimelineEvents = [...baseTimelineEvents, ...dynamicEvents];
 
   const handleSignatureSuccess = (signature: SignatureRecord) => {
     setStatus('signed');
@@ -230,11 +178,11 @@ function ESignAppPage() {
               <div className="esign-info-label">Source System</div>
             </div>
             <div className="esign-info-item">
-              <div className="esign-info-value">Batch 42</div>
+              <div className="esign-info-value">{batchFile ? 'Batch 42' : file.fileName.match(/(\w+-\d+)/)?.[1] || file.fileId}</div>
               <div className="esign-info-label">Batch</div>
             </div>
             <div className="esign-info-item">
-              <div className="esign-info-value">CRO Alpha</div>
+              <div className="esign-info-value">{batchFile ? 'CRO Alpha' : file.sourceSystem}</div>
               <div className="esign-info-label">Study Name</div>
             </div>
             {status === 'signed' && lastSignature && (

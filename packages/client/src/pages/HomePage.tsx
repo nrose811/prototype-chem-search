@@ -1,5 +1,5 @@
 import CustomCard from '../components/CustomCard';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
 // Icon components
@@ -79,23 +79,31 @@ function HomePage() {
     },
   ];
 
-  const savedSearches: CardItem[] = [
+  const navigate = useNavigate();
+
+  const savedSearches: (CardItem & { searchCategory?: string })[] = [
+    {
+      icon: <SearchIcon />,
+      title: 'Files without signature',
+      subtitle: '100 files',
+      searchCategory: 'unsigned',
+    },
+    {
+      icon: <SearchIcon />,
+      title: 'GxP Signed files',
+      subtitle: '10 files',
+      searchCategory: 'signed',
+    },
+    {
+      icon: <PdfIcon />,
+      title: 'eSignature Reports',
+      subtitle: '10 reports',
+      searchCategory: 'reports',
+    },
     {
       icon: <SearchIcon />,
       title: 'All data for proteomics study 3',
       subtitle: 'This morning',
-      link: '/search-results',
-    },
-    {
-      icon: <SearchIcon />,
-      title: 'Mass spec data for Sample#97',
-      subtitle: '3 months',
-      link: '/search-results',
-    },
-    {
-      icon: <SearchIcon />,
-      title: 'All my data',
-      subtitle: 'Last month',
       link: '/search-results',
     },
   ];
@@ -133,7 +141,7 @@ function HomePage() {
     },
   ];
 
-  const renderSection = (title: string, items: CardItem[], viewAllLink: string) => (
+  const renderSection = (title: string, items: (CardItem & { searchCategory?: string })[], viewAllLink: string) => (
     <div className="home-section">
       <div className="section-header">
         <h3>{title}</h3>
@@ -148,11 +156,24 @@ function HomePage() {
                   <div className="card-title">{item.title}</div>
                   <div className="card-subtitle">{item.subtitle}</div>
                 </div>
-                <button className="card-menu-btn" aria-label="More options">
+                <button className="card-menu-btn" aria-label="More options" onClick={(e) => e.preventDefault()}>
                   <MoreIcon />
                 </button>
               </>
             );
+
+            if (item.searchCategory) {
+              return (
+                <div
+                  key={index}
+                  className="list-item list-item-link"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate('/search-results', { state: { searchCategory: item.searchCategory } })}
+                >
+                  {content}
+                </div>
+              );
+            }
 
             return item.link ? (
               <Link key={index} to={item.link} className="list-item list-item-link">
