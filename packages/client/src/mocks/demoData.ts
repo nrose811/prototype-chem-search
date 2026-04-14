@@ -18,6 +18,9 @@ export interface FileManifestItem {
   sha256: string;
   assayType: string;
   uploadedAt: string;
+  fileType?: 'document' | 'pdf';
+  esignManifest?: { version: string; status: 'signed'; timestamp: string } | null;
+  signedFileId?: string;
 }
 
 export interface AssayResult {
@@ -549,18 +552,7 @@ export const HIC_STANDARD_CHROMATOGRAM: ChromatogramSeries = {
 // Search & Demo Data — Unsigned / Signed / Report Files
 // ============================================================
 
-export interface DemoFile {
-  fileId: string;
-  fileName: string;
-  sourceSystem: string;
-  versionId: string;
-  sha256: string;
-  assayType: string;
-  uploadedAt: string;
-  fileType?: 'document' | 'pdf';
-  esignManifest?: { version: string; status: 'signed'; timestamp: string } | null;
-  signedFileId?: string;
-}
+export type DemoFile = FileManifestItem;
 
 function fakeSha(seed: string): string {
   let h = 0;

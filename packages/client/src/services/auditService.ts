@@ -27,11 +27,13 @@ export function addAuditEvent(event: AuditEvent): void {
 export interface AuditContext {
   origin?: string;
   entityName?: string;
+  datasetVersion?: string;
 }
 
 const DEFAULT_CONTEXT: Required<AuditContext> = {
   origin: 'CRO Data Review App v1.4.0',
   entityName: 'CRO Alpha -- Batch 42',
+  datasetVersion: '',
 };
 
 /**

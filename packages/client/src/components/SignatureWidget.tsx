@@ -57,15 +57,15 @@ export default function SignatureWidget({
     setState('authenticating');
     setErrorMsg('');
     const authResult = await provider.reauthenticate(DEMO_USER.userId);
-    if (authResult.ok) {
-      setAuthToken(authResult.token);
-      setAuthMethod(authResult.method);
-      setSsoAuthenticated(true);
-      setState('idle');
-    } else {
-      setErrorMsg(authResult.error);
+    if (!authResult.ok) {
+      setErrorMsg((authResult as { ok: false; error: string }).error);
       setState('error');
+      return;
     }
+    setAuthToken(authResult.token);
+    setAuthMethod(authResult.method);
+    setSsoAuthenticated(true);
+    setState('idle');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,8 +84,9 @@ export default function SignatureWidget({
       setErrorMsg('');
       const authResult = await provider.reauthenticate(DEMO_USER.userId, password);
       if (!authResult.ok) {
-        recordSignatureFailed(batchId, datasetVersion, authResult.error, auditContext);
-        setErrorMsg(authResult.error);
+        const failMsg = (authResult as import('../services/authProvider').AuthFailure).error;
+        recordSignatureFailed(batchId, datasetVersion, failMsg, auditContext);
+        setErrorMsg(failMsg);
         setState('error');
         return;
       }

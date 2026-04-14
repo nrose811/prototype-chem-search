@@ -559,3 +559,4 @@ pip-selfcheck.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/vim,emacs,macos,python,virtualenv,intellij+all,visualstudiocode,node,react
+.vercel
