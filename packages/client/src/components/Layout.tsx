@@ -36,13 +36,8 @@ const sidebarItems = [
   },
   {
     icon: 'chart',
-    label: 'Visualize data',
+    label: 'AI Companion',
     path: '/visualize',
-  },
-  {
-    icon: 'dashboard',
-    label: 'Dashboards',
-    path: '/dashboards',
   },
 ];
 
