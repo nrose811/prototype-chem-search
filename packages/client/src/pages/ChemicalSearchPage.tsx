@@ -150,7 +150,7 @@ function ChemicalSearchPage() {
   // Breadcrumb trail for current step
   const breadcrumbs = useMemo(() => {
     const crumbs: { label: string; step: Step | null }[] = [
-      { label: 'Draw / Input', step: 1 },
+      { label: 'Draw or Search', step: 1 },
     ];
     if (step >= 2) crumbs.push({ label: 'Search Results', step: 2 });
     if (step >= 3) crumbs.push({ label: 'Molecule Detail', step: 3 });
@@ -180,14 +180,6 @@ function ChemicalSearchPage() {
           );
         })}
       </nav>
-
-      {/* Header */}
-      <div className="chemsrch-header">
-        <h1>Molecule Search</h1>
-        <p className="chemsrch-subtitle">
-          Search molecule registration database by structure and find associated platform data
-        </p>
-      </div>
 
       {/* Step indicator */}
       <StepIndicator current={step} />
@@ -246,7 +238,7 @@ function ChemicalSearchPage() {
 
 function StepIndicator({ current }: { current: Step }) {
   const steps = [
-    { num: 1, label: 'Draw / Input' },
+    { num: 1, label: 'Draw or Search' },
     { num: 2, label: 'Search Results' },
     { num: 3, label: 'Molecule Detail' },
     { num: 4, label: 'Associated Files' },
