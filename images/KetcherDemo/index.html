@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Ketcher</title><script defer="defer" src="/KetcherDemo/static/js/main.a44a608c.js"></script><link href="/KetcherDemo/static/css/main.bdf7ea17.css" rel="stylesheet"><style>html,body,#root{margin:0;padding:0;width:100%;height:100%;overflow:hidden}</style></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>
+// postMessage bridge for parent iframe communication
+(function(){
+  function sendToParent(t,p){window.parent.postMessage({source:'ketcher-iframe',type:t,payload:p},'*')}
+  var poll=setInterval(function(){if(window.ketcher){clearInterval(poll);sendToParent('ready',{})}},200);
+  setTimeout(function(){clearInterval(poll)},25000);
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.source!=='ketcher-parent')return;
+    if(e.data.type==='getSmiles'&&window.ketcher){
+      window.ketcher.getSmiles().then(function(s){sendToParent('smiles',{id:e.data.id,smiles:s})})
+      .catch(function(){sendToParent('smiles',{id:e.data.id,smiles:''})});
+    }
+    if(e.data.type==='setSmiles'&&window.ketcher){
+      window.ketcher.setMolecule(e.data.smiles||'').catch(function(){});
+    }
+  });
+})();
+</script></body></html>

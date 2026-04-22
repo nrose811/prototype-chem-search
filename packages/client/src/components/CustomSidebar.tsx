@@ -58,6 +58,20 @@ const iconMap: Record<string, JSX.Element> = {
       <path d="M3 13h2v8H3v-8zm6-6h2v14H9V7zm6 3h2v11h-2V10zm6-7h2v18h-2V3z" />
     </svg>
   ),
+  chemistry: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {/* Benzene ring */}
+      <polygon points="12,3 17.2,6 17.2,12 12,15 6.8,12 6.8,6" />
+      <polygon points="12,5 15.4,7 15.4,11 12,13 8.6,11 8.6,7" fill="none" strokeWidth="1" strokeDasharray="2,2" />
+      {/* Substituent bonds */}
+      <line x1="12" y1="15" x2="12" y2="19" />
+      <circle cx="12" cy="20.5" r="1.5" fill="currentColor" stroke="none" />
+      <line x1="17.2" y1="6" x2="20.5" y2="4" />
+      <circle cx="21.5" cy="3.5" r="1.5" fill="currentColor" stroke="none" />
+      <line x1="6.8" y1="6" x2="3.5" y2="4" />
+      <circle cx="2.5" cy="3.5" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  ),
   dashboard: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
       <path d="M3 3v18h18" stroke="currentColor" strokeWidth="2" fill="none"/>

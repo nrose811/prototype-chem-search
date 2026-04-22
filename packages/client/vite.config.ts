@@ -21,4 +21,7 @@ export default defineConfig({
 	plugins: [react()],
 	// Serve images from root-level images folder
 	publicDir: resolve(__dirname, '../../images'),
+	worker: {
+		format: 'es',
+	},
 });

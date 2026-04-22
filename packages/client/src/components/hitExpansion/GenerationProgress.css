@@ -1,0 +1,33 @@
+/* ── Generation Progress ──────────────────────────────────── */
+
+.he-progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+}
+.he-progress-label {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}
+.he-progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.he-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3498db, #2563eb);
+  border-radius: 4px;
+  transition: width 0.15s ease;
+}
+.he-progress-pct {
+  font-size: 13px;
+  color: #6c757d;
+  font-variant-numeric: tabular-nums;
+}

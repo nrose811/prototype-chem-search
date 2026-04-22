@@ -25,6 +25,11 @@ const sidebarItems = [
     path: '/search',
   },
   {
+    icon: 'chemistry',
+    label: 'Chemical Search',
+    path: '/chemical-search',
+  },
+  {
     icon: 'apps',
     label: 'Apps',
     path: '/apps',

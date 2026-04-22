@@ -22,6 +22,11 @@ import HicQcDetailsPage from './pages/HicQcDetailsPage';
 import HicQcSummaryPage from './pages/HicQcSummaryPage';
 import HicQcSignedReportPage from './pages/HicQcSignedReportPage';
 import ESignAppPage from './pages/ESignAppPage';
+import ChemSearchPage from './pages/ChemSearchPage';
+import HitExpansionLandingPage from './pages/HitExpansionLandingPage';
+import LatentBridgePage from './pages/LatentBridgePage';
+import RadialExpansionPage from './pages/RadialExpansionPage';
+import ChemicalSearchPage from './pages/ChemicalSearchPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import { HicNavigationProvider } from './contexts/HicNavigationContext';
 import { AuthProviderProvider } from './contexts/AuthProviderContext';
@@ -61,6 +66,12 @@ function AppRoutes() {
           <Route path="apps/hic-qc/report/:reportId" element={<HicQcSignedReportPage />} />
           <Route path="apps/esign" element={<ESignAppPage />} />
           <Route path="apps/esign/:fileId" element={<ESignAppPage />} />
+          <Route path="apps/chem-search" element={<ChemSearchPage />} />
+          <Route path="apps/hit-expansion" element={<HitExpansionLandingPage />} />
+          <Route path="apps/hit-expansion/latent-bridge" element={<LatentBridgePage />} />
+          <Route path="apps/hit-expansion/radial" element={<RadialExpansionPage />} />
+          <Route path="chemical-search" element={<ChemicalSearchPage />} />
+          <Route path="apps/chemical-search" element={<ChemicalSearchPage />} />
           <Route path="audit-trail" element={<AuditTrailPage />} />
           <Route path="visualize" element={<VisualizePage />} />
           <Route path="upload" element={<UploadPage />} />

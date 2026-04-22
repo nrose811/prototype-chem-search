@@ -1,0 +1,63 @@
+/* ── Ketcher Editor Wrapper ───────────────────────────────── */
+
+.ketcher-container {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background: #f8f9fa;
+}
+
+.ketcher-container > div {
+  height: 100% !important;
+}
+
+.ketcher-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 14px;
+}
+.ketcher-loading p {
+  margin: 0;
+}
+
+.ketcher-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e9ecef;
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: ketcherSpin 0.8s linear infinite;
+}
+
+@keyframes ketcherSpin {
+  to { transform: rotate(360deg); }
+}
+
+.ketcher-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+  color: #6d4c00;
+  font-size: 14px;
+  text-align: center;
+}
+.ketcher-fallback-icon {
+  font-size: 32px;
+}
+.ketcher-fallback p {
+  margin: 0;
+}

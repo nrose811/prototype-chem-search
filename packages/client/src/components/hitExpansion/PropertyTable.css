@@ -1,0 +1,124 @@
+/* ── Hit Expansion Property Table ─────────────────────────── */
+
+.he-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.he-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+.he-table-count {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+.he-toggle-cols-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: #fff;
+  color: #6c63ff;
+  cursor: pointer;
+}
+.he-toggle-cols-btn:hover {
+  background: #f0f0ff;
+}
+
+.he-table-scroll {
+  flex: 1;
+  overflow: auto;
+}
+
+.he-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.he-th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.he-th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.he-th.sortable:hover {
+  color: #343a40;
+}
+.he-sort-arrow {
+  font-size: 9px;
+}
+
+.he-row {
+  border-bottom: 1px solid #f1f3f5;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.he-row:hover {
+  background: #f0f7ff;
+}
+.he-row.selected {
+  background: #e3f0fd;
+}
+
+.he-td {
+  padding: 6px 10px;
+  color: #343a40;
+}
+.he-td.he-mono {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px;
+}
+.he-td.he-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.he-cart-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.he-cart-btn:hover {
+  border-color: #3498db;
+  color: #3498db;
+}
+.he-cart-btn.in-cart {
+  background: #3498db;
+  border-color: #3498db;
+  color: #fff;
+}

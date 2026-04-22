@@ -122,6 +122,39 @@ function AppsPage() {
       isFavorite: true,
     },
     {
+      id: 'chemical-search',
+      icon: <FlaskIcon />,
+      title: 'Chemical Search',
+      description: 'Search chemical registration database by structure and find associated platform data',
+      version: 'v1.0.0',
+      buttonText: 'OPEN',
+      buttonVariant: 'primary',
+      category: ['All Apps', 'Data', 'Featured'],
+      isFavorite: true,
+    },
+    {
+      id: 'hit-expansion',
+      icon: <LineageIcon />,
+      title: 'Hit Expansion',
+      description: 'Explore chemical space with latent bridge interpolation and radial expansion',
+      version: 'v1.0.0',
+      buttonText: 'OPEN',
+      buttonVariant: 'primary',
+      category: ['All Apps', 'AI', 'Featured'],
+      isFavorite: true,
+    },
+    {
+      id: 'chem-search',
+      icon: <FlaskIcon />,
+      title: 'Chem Search',
+      description: 'Browse DEL screening files, view data lineage, and preview IDS compound data',
+      version: 'v1.0.0',
+      buttonText: 'OPEN',
+      buttonVariant: 'primary',
+      category: ['All Apps', 'Data', 'Featured'],
+      isFavorite: true,
+    },
+    {
       id: '4',
       icon: <LineageIcon />,
       title: 'Lineage Explorer',
@@ -190,9 +223,9 @@ function AppsPage() {
   ];
 
   const filters: { label: FilterCategory; count: number }[] = [
-    { label: 'All Apps', count: 8 },
-    { label: 'Favorite', count: 4 },
-    { label: 'Featured', count: 5 },
+    { label: 'All Apps', count: 11 },
+    { label: 'Favorite', count: 7 },
+    { label: 'Featured', count: 8 },
   ];
 
   const filteredApps = apps.filter(app => {
@@ -252,6 +285,12 @@ function AppsPage() {
                     navigate('/apps/hic-qc');
                   } else if (app.id === 'esign') {
                     navigate('/apps/esign');
+                  } else if (app.id === 'chem-search') {
+                    navigate('/apps/chem-search');
+                  } else if (app.id === 'hit-expansion') {
+                    navigate('/apps/hit-expansion');
+                  } else if (app.id === 'chemical-search') {
+                    navigate('/apps/chemical-search');
                   }
                 }}
               >
