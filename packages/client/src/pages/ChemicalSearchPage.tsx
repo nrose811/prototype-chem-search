@@ -20,6 +20,25 @@ import {
 } from '../mocks/chemRegData';
 import './ChemicalSearchPage.css';
 
+// ── Saved Searches ──────────────────────────────────────────
+
+interface SavedSearch {
+  id: string;
+  name: string;
+  smiles: string;
+  options: SearchOptions;
+  savedAt: string;
+  resultCount: number;
+}
+
+const MOCK_SAVED_SEARCHES: SavedSearch[] = [
+  { id: 'ss-1', name: 'Kinase scaffold similarity', smiles: 'CC1=C(C=C(C=C1)NC(=O)C2=CC=C(C=C2)CN3CCN(CC3)C)NC4=NC=CC(=N4)C5=CN=CC=C5', options: { ...DEFAULT_SEARCH_OPTIONS, mode: 'similarity', metric: 'tanimoto', threshold: 0.3 }, savedAt: '2026-04-18T14:30:00Z', resultCount: 12 },
+  { id: 'ss-2', name: 'Aspirin substructure', smiles: 'CC(=O)OC1=CC=CC=C1C(=O)O', options: { ...DEFAULT_SEARCH_OPTIONS, mode: 'substructure' }, savedAt: '2026-04-20T09:15:00Z', resultCount: 3 },
+  { id: 'ss-3', name: 'JAK2 series — exact', smiles: 'CC1=NC(=CC(=N1)NC2=CC(=C(C=C2)C(=O)NC3=C(C=CC=C3F)S(=O)(=O)C)OC)N4CCNCC4', options: { ...DEFAULT_SEARCH_OPTIONS, mode: 'exact' }, savedAt: '2026-04-21T11:00:00Z', resultCount: 1 },
+  { id: 'ss-4', name: 'Sulfonamide compounds', smiles: 'C1=CC=C(C=C1)S(=O)(=O)N', options: { ...DEFAULT_SEARCH_OPTIONS, mode: 'similarity', threshold: 0.2 }, savedAt: '2026-04-15T16:45:00Z', resultCount: 8 },
+  { id: 'ss-5', name: 'Formula: C9H8O4', smiles: 'C9H8O4', options: { ...DEFAULT_SEARCH_OPTIONS, mode: 'formula' }, savedAt: '2026-04-22T08:00:00Z', resultCount: 1 },
+];
+
 type Step = 1 | 2 | 3 | 4;
 
 function ChemicalSearchPage() {
@@ -28,6 +47,8 @@ function ChemicalSearchPage() {
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({ ...DEFAULT_SEARCH_OPTIONS });
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [selectedCompounds, setSelectedCompounds] = useState<ChemRegCompound[]>([]);
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>(MOCK_SAVED_SEARCHES);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [detailCompound, setDetailCompound] = useState<ChemRegCompound | null>(null);
   const [associatedFiles, setAssociatedFiles] = useState<PlatformFile[]>([]);
   const [ketcherReady, setKetcherReady] = useState(false);
@@ -99,6 +120,30 @@ function ChemicalSearchPage() {
     [searchOptions, querySmiles],
   );
 
+  // ── Save search ───────────────────────────────────────────
+  const handleSaveSearch = useCallback((name: string) => {
+    const newSaved: SavedSearch = {
+      id: `ss-${Date.now()}`,
+      name,
+      smiles: querySmiles,
+      options: { ...searchOptions },
+      savedAt: new Date().toISOString(),
+      resultCount: searchResults.length,
+    };
+    setSavedSearches((prev) => [newSaved, ...prev]);
+    setShowSaveDialog(false);
+  }, [querySmiles, searchOptions, searchResults]);
+
+  // ── Load saved search ─────────────────────────────────────
+  const handleLoadSearch = useCallback((saved: SavedSearch) => {
+    setQuerySmiles(saved.smiles);
+    setSearchOptions(saved.options);
+    // Try to set Ketcher if available
+    if (ketcherRef.current && saved.options.mode !== 'formula') {
+      ketcherRef.current.setSmiles(saved.smiles);
+    }
+  }, []);
+
   // Compounds to show in files step
   const filesCompounds = selectedCompounds.length > 0 ? selectedCompounds : (detailCompound ? [detailCompound] : []);
 
@@ -107,7 +152,7 @@ function ChemicalSearchPage() {
       {/* Header */}
       <div className="chemsrch-header">
         <Link to="/" className="chemsrch-back-link">&larr; Home</Link>
-        <h1>Chemical Search</h1>
+        <h1>Molecule Search</h1>
         <p className="chemsrch-subtitle">
           Search chemical registration database by structure and find associated platform data
         </p>
@@ -122,9 +167,11 @@ function ChemicalSearchPage() {
           ketcherRef={ketcherRef}
           querySmiles={querySmiles}
           searchOptions={searchOptions}
+          savedSearches={savedSearches}
           onSmilesChange={setQuerySmiles}
           onOptionChange={updateOption}
           onSearch={handleSearch}
+          onLoadSearch={handleLoadSearch}
           onKetcherReady={() => setKetcherReady(true)}
         />
       )}
@@ -155,6 +202,10 @@ function ChemicalSearchPage() {
         <AssociatedFilesStep
           compounds={filesCompounds}
           files={associatedFiles}
+          showSaveDialog={showSaveDialog}
+          onShowSaveDialog={() => setShowSaveDialog(true)}
+          onSaveSearch={handleSaveSearch}
+          onCancelSave={() => setShowSaveDialog(false)}
           onBack={() => setStep(selectedCompounds.length > 0 ? 2 : 3)}
           onNewSearch={handleNewSearch}
         />
@@ -196,21 +247,63 @@ function MoleculeInputStep({
   ketcherRef,
   querySmiles,
   searchOptions,
+  savedSearches,
   onSmilesChange,
   onOptionChange,
   onSearch,
+  onLoadSearch,
   onKetcherReady,
 }: {
   ketcherRef: React.RefObject<KetcherEditorHandle | null>;
   querySmiles: string;
   searchOptions: SearchOptions;
+  savedSearches: SavedSearch[];
   onSmilesChange: (s: string) => void;
   onOptionChange: <K extends keyof SearchOptions>(key: K, value: SearchOptions[K]) => void;
   onSearch: () => void;
+  onLoadSearch: (saved: SavedSearch) => void;
   onKetcherReady: () => void;
 }) {
+  const [showSaved, setShowSaved] = useState(false);
+
   return (
     <div className="chemsrch-input-step">
+      {/* Saved searches panel */}
+      <div className="chemsrch-saved-bar">
+        <button className="chemsrch-saved-toggle" onClick={() => setShowSaved(!showSaved)}>
+          <SavedSearchIcon />
+          Saved Searches ({savedSearches.length})
+          <span className="chemsrch-saved-chevron">{showSaved ? '▲' : '▼'}</span>
+        </button>
+      </div>
+
+      {showSaved && (
+        <div className="chemsrch-saved-panel">
+          {savedSearches.length === 0 ? (
+            <p className="chemsrch-saved-empty">No saved searches yet. Run a search and save it from the results page.</p>
+          ) : (
+            <div className="chemsrch-saved-list">
+              {savedSearches.map((s) => (
+                <button
+                  key={s.id}
+                  className="chemsrch-saved-item"
+                  onClick={() => { onLoadSearch(s); setShowSaved(false); }}
+                >
+                  <div className="chemsrch-saved-item-main">
+                    <span className="chemsrch-saved-item-name">{s.name}</span>
+                    <span className={`chemsrch-match-badge ${s.options.mode}`}>{s.options.mode}</span>
+                  </div>
+                  <div className="chemsrch-saved-item-meta">
+                    <code>{s.smiles.length > 40 ? s.smiles.slice(0, 40) + '…' : s.smiles}</code>
+                    <span>{s.resultCount} results &middot; {formatDate(s.savedAt)}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {searchOptions.mode !== 'formula' && (
         <div className="chemsrch-editor-section">
           <label className="chemsrch-label">Draw a molecule</label>
@@ -623,14 +716,23 @@ function CompoundDetailStep({
 function AssociatedFilesStep({
   compounds,
   files,
+  showSaveDialog,
+  onShowSaveDialog,
+  onSaveSearch,
+  onCancelSave,
   onBack,
   onNewSearch,
 }: {
   compounds: ChemRegCompound[];
   files: PlatformFile[];
+  showSaveDialog: boolean;
+  onShowSaveDialog: () => void;
+  onSaveSearch: (name: string) => void;
+  onCancelSave: () => void;
   onBack: () => void;
   onNewSearch: () => void;
 }) {
+  const [saveName, setSaveName] = useState('');
   const [selectedFile, setSelectedFile] = useState<PlatformFile | null>(null);
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -735,7 +837,35 @@ function AssociatedFilesStep({
       <div className="chemsrch-files-toolbar">
         <button className="chemsrch-text-btn" onClick={onBack}>&larr; Back</button>
         <button className="chemsrch-text-btn" onClick={onNewSearch}>New search</button>
+        <div style={{ flex: 1 }} />
+        <button className="chemsrch-save-btn" onClick={onShowSaveDialog}>
+          <SavedSearchIcon /> Save Search
+        </button>
       </div>
+
+      {showSaveDialog && (
+        <div className="chemsrch-save-dialog">
+          <label className="chemsrch-label">Save this search</label>
+          <div className="chemsrch-save-dialog-row">
+            <input
+              className="chemsrch-smiles-input"
+              placeholder="Search name, e.g. 'Kinase scaffold similarity'"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && saveName.trim()) onSaveSearch(saveName.trim()); }}
+              autoFocus
+            />
+            <button
+              className="chemsrch-save-confirm-btn"
+              disabled={!saveName.trim()}
+              onClick={() => { onSaveSearch(saveName.trim()); setSaveName(''); }}
+            >
+              Save
+            </button>
+            <button className="chemsrch-text-btn" onClick={onCancelSave}>Cancel</button>
+          </div>
+        </div>
+      )}
 
       <div className="chemsrch-files-banner">
         <div className="chemsrch-files-compounds">
@@ -774,6 +904,14 @@ function AssociatedFilesStep({
     </div>
   );
 }
+
+// ── Saved search icon ────────────────────────────────────
+
+const SavedSearchIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+  </svg>
+);
 
 // ── Action Icons (matching SearchResultsPage style) ──────
 

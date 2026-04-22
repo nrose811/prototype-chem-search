@@ -1,4 +1,4 @@
-# Example Queries for Chemical Search
+# Example Queries for Molecule Search
 
 ## SMILES — Exact Matches (in mock DB)
 

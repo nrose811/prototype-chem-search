@@ -97,6 +97,144 @@
   margin-bottom: 8px;
 }
 
+/* Saved searches */
+.chemsrch-saved-bar {
+  display: flex;
+  align-items: center;
+}
+.chemsrch-saved-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chemsrch-saved-toggle:hover { background: #f8f9fa; border-color: #adb5bd; }
+.chemsrch-saved-toggle svg { color: #3498db; }
+.chemsrch-saved-chevron { font-size: 10px; color: #868e96; margin-left: 4px; }
+
+.chemsrch-saved-panel {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.chemsrch-saved-empty {
+  font-size: 13px;
+  color: #868e96;
+  text-align: center;
+  padding: 16px;
+  margin: 0;
+}
+.chemsrch-saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chemsrch-saved-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.chemsrch-saved-item:hover {
+  background: #e3f0fd;
+  border-color: #90caf9;
+}
+.chemsrch-saved-item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chemsrch-saved-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #343a40;
+}
+.chemsrch-saved-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: #868e96;
+}
+.chemsrch-saved-item-meta code {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: #e9ecef;
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: #495057;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Save search button */
+.chemsrch-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid #3498db;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3498db;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chemsrch-save-btn:hover { background: #e3f0fd; }
+.chemsrch-save-btn svg { flex-shrink: 0; }
+
+/* Save dialog */
+.chemsrch-save-dialog {
+  background: #f0f7ff;
+  border: 1px solid #90caf9;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.chemsrch-save-dialog-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chemsrch-save-dialog-row .chemsrch-smiles-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 13px;
+}
+.chemsrch-save-confirm-btn {
+  padding: 8px 20px;
+  background: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chemsrch-save-confirm-btn:hover:not(:disabled) { background: #2980b9; }
+.chemsrch-save-confirm-btn:disabled { opacity: 0.4; cursor: default; }
+
 /* Step 1: Input */
 .chemsrch-input-step {
   display: flex;
