@@ -16,6 +16,7 @@ const routeLabels: Record<string, string> = {
   'visualize': 'Visualize data',
   'dashboards': 'Dashboards',
   'upload': 'Upload',
+  'chemical-search': 'Molecule Search',
 };
 
 // Special breadcrumb paths for routes that need custom parent paths
