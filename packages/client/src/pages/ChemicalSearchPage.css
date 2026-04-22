@@ -5,6 +5,38 @@
   max-width: 1400px;
 }
 
+/* Breadcrumb nav */
+.chemsrch-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.chemsrch-breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+.chemsrch-breadcrumb-link {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+.chemsrch-breadcrumb-link:hover {
+  text-decoration: underline;
+}
+.chemsrch-breadcrumb-sep {
+  margin: 0 8px;
+  color: #adb5bd;
+}
+.chemsrch-breadcrumb-current {
+  color: #495057;
+  font-weight: 500;
+}
+
 /* Header */
 .chemsrch-header {
   margin-bottom: 24px;

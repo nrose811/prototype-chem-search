@@ -147,11 +147,42 @@ function ChemicalSearchPage() {
   // Compounds to show in files step
   const filesCompounds = selectedCompounds.length > 0 ? selectedCompounds : (detailCompound ? [detailCompound] : []);
 
+  // Breadcrumb trail for current step
+  const breadcrumbs = useMemo(() => {
+    const crumbs: { label: string; step: Step | null }[] = [
+      { label: 'Draw / Input', step: 1 },
+    ];
+    if (step >= 2) crumbs.push({ label: 'Search Results', step: 2 });
+    if (step >= 3) crumbs.push({ label: 'Molecule Detail', step: 3 });
+    if (step >= 4) crumbs.push({ label: 'Associated Files', step: 4 });
+    return crumbs;
+  }, [step]);
+
   return (
     <div className="chemsrch-page">
+      {/* Breadcrumb nav */}
+      <nav className="chemsrch-breadcrumb">
+        {breadcrumbs.map((crumb, i) => {
+          const isLast = i === breadcrumbs.length - 1;
+          return (
+            <span key={crumb.label} className="chemsrch-breadcrumb-item">
+              {!isLast ? (
+                <>
+                  <button className="chemsrch-breadcrumb-link" onClick={() => crumb.step && setStep(crumb.step)}>
+                    {crumb.label}
+                  </button>
+                  <span className="chemsrch-breadcrumb-sep">/</span>
+                </>
+              ) : (
+                <span className="chemsrch-breadcrumb-current">{crumb.label}</span>
+              )}
+            </span>
+          );
+        })}
+      </nav>
+
       {/* Header */}
       <div className="chemsrch-header">
-        <Link to="/" className="chemsrch-back-link">&larr; Home</Link>
         <h1>Molecule Search</h1>
         <p className="chemsrch-subtitle">
           Search molecule registration database by structure and find associated platform data
@@ -186,7 +217,6 @@ function ChemicalSearchPage() {
           onOptionsChange={handleOptionsChange}
           onViewDetail={handleViewDetail}
           onFindFiles={handleFindFiles}
-          onBack={() => setStep(1)}
         />
       )}
 
@@ -194,7 +224,6 @@ function ChemicalSearchPage() {
         <CompoundDetailStep
           compound={detailCompound}
           onFindFiles={handleFindFiles}
-          onBack={() => setStep(2)}
         />
       )}
 
@@ -206,7 +235,6 @@ function ChemicalSearchPage() {
           onShowSaveDialog={() => setShowSaveDialog(true)}
           onSaveSearch={handleSaveSearch}
           onCancelSave={() => setShowSaveDialog(false)}
-          onBack={() => setStep(selectedCompounds.length > 0 ? 2 : 3)}
           onNewSearch={handleNewSearch}
         />
       )}
@@ -414,7 +442,6 @@ function SearchResultsStep({
   onOptionsChange,
   onViewDetail,
   onFindFiles,
-  onBack,
 }: {
   querySmiles: string;
   searchOptions: SearchOptions;
@@ -424,7 +451,6 @@ function SearchResultsStep({
   onOptionsChange: (opts: Partial<SearchOptions>) => void;
   onViewDetail: (c: ChemRegCompound) => void;
   onFindFiles: () => void;
-  onBack: () => void;
 }) {
   const [sortKey, setSortKey] = useState<string>('similarity');
   const [sortAsc, setSortAsc] = useState(false);
@@ -537,7 +563,6 @@ function SearchResultsStep({
   return (
     <div className="chemsrch-results-step">
       <div className="chemsrch-results-toolbar">
-        <button className="chemsrch-text-btn" onClick={onBack}>&larr; Back to drawing</button>
         <div className="chemsrch-results-info">
           <span className="chemsrch-result-count">{results.length}</span>
           <span>results for</span>
@@ -600,20 +625,14 @@ function SearchResultsStep({
 function CompoundDetailStep({
   compound,
   onFindFiles,
-  onBack,
 }: {
   compound: ChemRegCompound;
   onFindFiles: () => void;
-  onBack: () => void;
 }) {
   const lipinski = lipinskiRuleOfFive(compound);
 
   return (
     <div className="chemsrch-detail-step">
-      <div className="chemsrch-detail-topbar">
-        <button className="chemsrch-text-btn" onClick={onBack}>&larr; Back to results</button>
-      </div>
-
       <div className="chemsrch-detail-layout">
         <div className="chemsrch-detail-structure">
           <MoleculeCard smiles={compound.smiles} width={280} height={200} name={compound.name} showSmiles />
@@ -720,7 +739,6 @@ function AssociatedFilesStep({
   onShowSaveDialog,
   onSaveSearch,
   onCancelSave,
-  onBack,
   onNewSearch,
 }: {
   compounds: ChemRegCompound[];
@@ -729,7 +747,6 @@ function AssociatedFilesStep({
   onShowSaveDialog: () => void;
   onSaveSearch: (name: string) => void;
   onCancelSave: () => void;
-  onBack: () => void;
   onNewSearch: () => void;
 }) {
   const [saveName, setSaveName] = useState('');
@@ -835,7 +852,6 @@ function AssociatedFilesStep({
   return (
     <div className="chemsrch-files-step">
       <div className="chemsrch-files-toolbar">
-        <button className="chemsrch-text-btn" onClick={onBack}>&larr; Back</button>
         <button className="chemsrch-text-btn" onClick={onNewSearch}>New search</button>
         <div style={{ flex: 1 }} />
         <button className="chemsrch-save-btn" onClick={onShowSaveDialog}>
