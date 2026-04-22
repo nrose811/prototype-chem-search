@@ -154,7 +154,7 @@ function ChemicalSearchPage() {
         <Link to="/" className="chemsrch-back-link">&larr; Home</Link>
         <h1>Molecule Search</h1>
         <p className="chemsrch-subtitle">
-          Search chemical registration database by structure and find associated platform data
+          Search molecule registration database by structure and find associated platform data
         </p>
       </div>
 
@@ -220,7 +220,7 @@ function StepIndicator({ current }: { current: Step }) {
   const steps = [
     { num: 1, label: 'Draw / Input' },
     { num: 2, label: 'Search Results' },
-    { num: 3, label: 'Compound Detail' },
+    { num: 3, label: 'Molecule Detail' },
     { num: 4, label: 'Associated Files' },
   ];
 
@@ -595,7 +595,7 @@ function SearchResultsStep({
   );
 }
 
-// ── Step 3: Compound Detail ──────────────────────────────────
+// ── Step 3: Molecule Detail ──────────────────────────────────
 
 function CompoundDetailStep({
   compound,

@@ -125,7 +125,7 @@ function AppsPage() {
       id: 'chemical-search',
       icon: <FlaskIcon />,
       title: 'Molecule Search',
-      description: 'Search chemical registration database by structure and find associated platform data',
+      description: 'Search molecule registration database by structure and find associated platform data',
       version: 'v1.0.0',
       buttonText: 'OPEN',
       buttonVariant: 'primary',
