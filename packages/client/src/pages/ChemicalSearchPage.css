@@ -3,6 +3,7 @@
 .chemsrch-page {
   padding: 24px;
   max-width: 1400px;
+  position: relative;
 }
 
 /* Breadcrumb nav */
@@ -597,9 +598,12 @@
   box-shadow: none;
 }
 
-/* Back button (per-step navigation) */
+/* Back button (per-step navigation) — pinned to the upper-right whitespace */
 .chemsrch-back-btn {
-  align-self: flex-start;
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 5;
   display: inline-flex;
   align-items: center;
   gap: 6px;
