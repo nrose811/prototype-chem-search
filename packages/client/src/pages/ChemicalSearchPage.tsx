@@ -11,6 +11,7 @@ import {
   formatDate,
   fileTypeColor,
   DEFAULT_SEARCH_OPTIONS,
+  CHEM_REG_COMPOUNDS,
   type ChemRegCompound,
   type SearchResult,
   type SearchOptions,
@@ -43,6 +44,23 @@ type Step = 1 | 2 | 3 | 4;
 
 function ChemicalSearchPage() {
   const [step, setStep] = useState<Step>(1);
+  const [stepHistory, setStepHistory] = useState<Step[]>([]);
+
+  // Navigate forward, remembering where we came from so Back is accurate
+  // even when steps are skipped (e.g. multi-select jumps 2 → 4).
+  const goStep = useCallback((next: Step) => {
+    setStepHistory((prev) => [...prev, step]);
+    setStep(next);
+  }, [step]);
+
+  const handleBack = useCallback(() => {
+    setStepHistory((prev) => {
+      if (prev.length === 0) return prev;
+      const last = prev[prev.length - 1];
+      setStep(last);
+      return prev.slice(0, -1);
+    });
+  }, []);
   const [querySmiles, setQuerySmiles] = useState('');
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({ ...DEFAULT_SEARCH_OPTIONS });
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -75,21 +93,21 @@ function ChemicalSearchPage() {
     const results = searchCompounds(smiles, searchOptions);
     setSearchResults(results);
     setSelectedCompounds([]);
-    setStep(2);
-  }, [querySmiles, searchOptions, ketcherReady]);
+    goStep(2);
+  }, [querySmiles, searchOptions, ketcherReady, goStep]);
 
   // ── Step 2 → 3: View compound detail ──────────────────────
   const handleViewDetail = useCallback((compound: ChemRegCompound) => {
     setDetailCompound(compound);
-    setStep(3);
-  }, []);
+    goStep(3);
+  }, [goStep]);
 
   // ── Step 2 → 3: View all selected compounds (multi-card grid) ─
   const handleViewSelected = useCallback(() => {
     if (selectedCompounds.length === 0) return;
     setDetailCompound(null); // null → detail step renders the selected set
-    setStep(3);
-  }, [selectedCompounds]);
+    goStep(3);
+  }, [selectedCompounds, goStep]);
 
   // ── Step 2/3 → 4: Find files for selected compounds ──────
   const handleFindFiles = useCallback(() => {
@@ -103,12 +121,13 @@ function ChemicalSearchPage() {
       }
     }
     setAssociatedFiles(Array.from(fileMap.values()));
-    setStep(4);
-  }, [selectedCompounds, detailCompound]);
+    goStep(4);
+  }, [selectedCompounds, detailCompound, goStep]);
 
   // ── Reset ──────────────────────────────────────────────────
   const handleNewSearch = useCallback(() => {
     setStep(1);
+    setStepHistory([]);
     setSearchResults([]);
     setSelectedCompounds([]);
     setDetailCompound(null);
@@ -141,6 +160,14 @@ function ChemicalSearchPage() {
     setShowSaveDialog(false);
   }, [querySmiles, searchOptions, searchResults]);
 
+  // ── Pick a compound by name (typeahead) → load its structure ─
+  const handleSelectCompound = useCallback((c: ChemRegCompound) => {
+    setQuerySmiles(c.smiles);
+    if (ketcherRef.current && searchOptions.mode !== 'formula') {
+      ketcherRef.current.setSmiles(c.smiles);
+    }
+  }, [searchOptions.mode]);
+
   // ── Load saved search ─────────────────────────────────────
   const handleLoadSearch = useCallback((saved: SavedSearch) => {
     setQuerySmiles(saved.smiles);
@@ -160,7 +187,7 @@ function ChemicalSearchPage() {
       { label: 'Draw or Search', step: 1 },
     ];
     if (step >= 2) crumbs.push({ label: 'Search Results', step: 2 });
-    if (step >= 3) crumbs.push({ label: 'Molecule Detail', step: 3 });
+    if (step >= 3) crumbs.push({ label: 'Compound Detail', step: 3 });
     if (step >= 4) crumbs.push({ label: 'Associated Files', step: 4 });
     return crumbs;
   }, [step]);
@@ -191,6 +218,13 @@ function ChemicalSearchPage() {
       {/* Step indicator */}
       <StepIndicator current={step} />
 
+      {/* Back navigation */}
+      {stepHistory.length > 0 && (
+        <button className="chemsrch-back-btn" onClick={handleBack}>
+          ← Back
+        </button>
+      )}
+
       {/* Steps */}
       {step === 1 && (
         <MoleculeInputStep
@@ -202,6 +236,7 @@ function ChemicalSearchPage() {
           onOptionChange={updateOption}
           onSearch={handleSearch}
           onLoadSearch={handleLoadSearch}
+          onSelectCompound={handleSelectCompound}
           onKetcherReady={() => setKetcherReady(true)}
         />
       )}
@@ -248,7 +283,7 @@ function StepIndicator({ current }: { current: Step }) {
   const steps = [
     { num: 1, label: 'Draw or Search' },
     { num: 2, label: 'Search Results' },
-    { num: 3, label: 'Molecule Detail' },
+    { num: 3, label: 'Compound Detail' },
     { num: 4, label: 'Associated Files' },
   ];
 
@@ -269,6 +304,72 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
+// ── Compound name typeahead ──────────────────────────────────
+
+function CompoundTypeahead({onSelect}: {onSelect: (c: ChemRegCompound) => void}) {
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = !q
+      ? CHEM_REG_COMPOUNDS
+      : CHEM_REG_COMPOUNDS.filter(
+          (c) =>
+            c.name.toLowerCase().includes(q) ||
+            c.molId.toLowerCase().includes(q) ||
+            c.formula.toLowerCase().includes(q),
+        );
+    return list.slice(0, 8);
+  }, [query]);
+
+  const pick = useCallback((c: ChemRegCompound) => {
+    onSelect(c);
+    setQuery(c.name);
+    setOpen(false);
+  }, [onSelect]);
+
+  return (
+    <div
+      className="chemsrch-typeahead"
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false); }}
+    >
+      <input
+        className="chemsrch-typeahead-input"
+        value={query}
+        placeholder="Search compounds by name, ID, or formula…"
+        onChange={(e) => { setQuery(e.target.value); setOpen(true); setActive(0); }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => Math.min(a + 1, matches.length - 1)); }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => Math.max(a - 1, 0)); }
+          else if (e.key === 'Enter') { if (matches[active]) { e.preventDefault(); pick(matches[active]); } }
+          else if (e.key === 'Escape') setOpen(false);
+        }}
+      />
+      <span className="chemsrch-typeahead-chevron">▾</span>
+      {open && matches.length > 0 && (
+        <ul className="chemsrch-typeahead-list">
+          {matches.map((c, i) => (
+            <li key={c.molId}>
+              <button
+                type="button"
+                className={`chemsrch-typeahead-item ${i === active ? 'active' : ''}`}
+                onMouseDown={(e) => { e.preventDefault(); pick(c); }}
+                onMouseEnter={() => setActive(i)}
+              >
+                <span className="chemsrch-typeahead-name">{c.name}</span>
+                <span className="chemsrch-typeahead-meta mono">{c.molId} · {c.formula}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 // ── Step 1: Molecule Input ───────────────────────────────────
 
 function MoleculeInputStep({
@@ -280,6 +381,7 @@ function MoleculeInputStep({
   onOptionChange,
   onSearch,
   onLoadSearch,
+  onSelectCompound,
   onKetcherReady,
 }: {
   ketcherRef: React.RefObject<KetcherEditorHandle | null>;
@@ -290,12 +392,18 @@ function MoleculeInputStep({
   onOptionChange: <K extends keyof SearchOptions>(key: K, value: SearchOptions[K]) => void;
   onSearch: () => void;
   onLoadSearch: (saved: SavedSearch) => void;
+  onSelectCompound: (c: ChemRegCompound) => void;
   onKetcherReady: () => void;
 }) {
   const [showSaved, setShowSaved] = useState(false);
 
   return (
     <div className="chemsrch-input-step">
+      {/* Find a known compound by name */}
+      <div className="chemsrch-typeahead-section">
+        <label className="chemsrch-label">Find a compound by name</label>
+        <CompoundTypeahead onSelect={onSelectCompound} />
+      </div>
       {/* Saved searches panel */}
       <div className="chemsrch-saved-bar">
         <button className="chemsrch-saved-toggle" onClick={() => setShowSaved(!showSaved)}>
@@ -642,6 +750,8 @@ function SearchResultsStep({
 
 // ── Step 3: Molecule Detail ──────────────────────────────────
 
+type DetailView = 'grid' | 'accordion';
+
 function CompoundDetailStep({
   compounds,
   onFindFiles,
@@ -650,19 +760,74 @@ function CompoundDetailStep({
   onFindFiles: () => void;
 }) {
   const multi = compounds.length > 1;
+  const [view, setView] = useState<DetailView>('grid');
+  // Accordion: track collapsed ids (default open = none collapsed)
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  const toggleCollapse = useCallback((molId: string) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(molId)) next.delete(molId);
+      else next.add(molId);
+      return next;
+    });
+  }, []);
 
   return (
     <div className="chemsrch-detail-step">
       {multi && (
-        <div className="chemsrch-detail-count">
-          {compounds.length} compounds selected
+        <div className="chemsrch-detail-bar">
+          <span className="chemsrch-detail-count">{compounds.length} compounds selected</span>
+          <div className="chemsrch-view-toggle">
+            <button
+              className={`chemsrch-view-btn ${view === 'grid' ? 'active' : ''}`}
+              onClick={() => setView('grid')}
+            >
+              Grid
+            </button>
+            <button
+              className={`chemsrch-view-btn ${view === 'accordion' ? 'active' : ''}`}
+              onClick={() => setView('accordion')}
+            >
+              Accordion
+            </button>
+          </div>
         </div>
       )}
-      <div className={`cmpd-card-grid ${multi ? 'multi' : ''}`}>
-        {compounds.map((c) => (
-          <CompoundCard key={c.molId} compound={c} />
-        ))}
-      </div>
+
+      {(!multi || view === 'grid') && (
+        <div className={`cmpd-card-grid ${multi ? 'multi' : ''}`}>
+          {compounds.map((c) => (
+            <CompoundCard key={c.molId} compound={c} />
+          ))}
+        </div>
+      )}
+
+      {multi && view === 'accordion' && (
+        <div className="chemsrch-accordion">
+          {compounds.map((c) => {
+            const open = !collapsed.has(c.molId);
+            return (
+              <div key={c.molId} className="chemsrch-accordion-item">
+                <button
+                  className="chemsrch-accordion-header"
+                  onClick={() => toggleCollapse(c.molId)}
+                  aria-expanded={open}
+                >
+                  <span className="chemsrch-accordion-chevron">{open ? '▾' : '▸'}</span>
+                  <span className="chemsrch-accordion-name">{c.name}</span>
+                  <span className="chemsrch-accordion-id mono">{c.molId}</span>
+                </button>
+                {open && (
+                  <div className="chemsrch-accordion-body">
+                    <CompoundCard compound={c} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <button className="cmpd-find-files-btn chemsrch-detail-cta" onClick={onFindFiles}>
         Find Associated Data Files{multi ? ` (${compounds.length} compounds)` : ''}

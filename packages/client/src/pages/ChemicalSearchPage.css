@@ -519,6 +519,178 @@
   align-self: flex-start;
 }
 
+/* Detail bar: count + view toggle */
+.chemsrch-detail-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.chemsrch-view-toggle {
+  display: inline-flex;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.chemsrch-view-btn {
+  padding: 6px 16px;
+  background: #fff;
+  color: #475569;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chemsrch-view-btn + .chemsrch-view-btn {
+  border-left: 1px solid #cbd5e1;
+}
+.chemsrch-view-btn.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Accordion view */
+.chemsrch-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chemsrch-accordion-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.chemsrch-accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.chemsrch-accordion-header:hover {
+  background: #f1f5f9;
+}
+.chemsrch-accordion-chevron {
+  color: #64748b;
+  font-size: 12px;
+}
+.chemsrch-accordion-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.chemsrch-accordion-id {
+  font-size: 12px;
+  color: #94a3b8;
+}
+.chemsrch-accordion-body {
+  padding: 4px;
+}
+/* Card inside accordion: drop its own border (item provides it) */
+.chemsrch-accordion-body .cmpd-card {
+  border: none;
+  box-shadow: none;
+}
+
+/* Back button (per-step navigation) */
+.chemsrch-back-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #fff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.chemsrch-back-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* Compound-name typeahead (Step 1) */
+.chemsrch-typeahead-section {
+  margin-bottom: 20px;
+}
+.chemsrch-typeahead {
+  position: relative;
+  max-width: 520px;
+}
+.chemsrch-typeahead-input {
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #fff;
+}
+.chemsrch-typeahead-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.chemsrch-typeahead-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 12px;
+  pointer-events: none;
+}
+.chemsrch-typeahead-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  z-index: 20;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.chemsrch-typeahead-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+.chemsrch-typeahead-item.active,
+.chemsrch-typeahead-item:hover {
+  background: #eff6ff;
+}
+.chemsrch-typeahead-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.chemsrch-typeahead-meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 /* Result count badge */
 .chemsrch-result-count {
   display: inline-flex;
