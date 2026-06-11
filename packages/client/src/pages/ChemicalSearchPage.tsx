@@ -399,18 +399,19 @@ function MoleculeInputStep({
 
   return (
     <div className="chemsrch-input-step">
-      {/* Find a known compound by name */}
-      <div className="chemsrch-typeahead-section">
-        <label className="chemsrch-label">Find a compound by name</label>
-        <CompoundTypeahead onSelect={onSelectCompound} />
-      </div>
-      {/* Saved searches panel */}
-      <div className="chemsrch-saved-bar">
-        <button className="chemsrch-saved-toggle" onClick={() => setShowSaved(!showSaved)}>
-          <SavedSearchIcon />
-          Saved Searches ({savedSearches.length})
-          <span className="chemsrch-saved-chevron">{showSaved ? '▲' : '▼'}</span>
-        </button>
+      {/* Top row: compound typeahead (left) + saved searches (right) */}
+      <div className="chemsrch-step1-top">
+        <div className="chemsrch-typeahead-section">
+          <label className="chemsrch-label">Find a compound by name</label>
+          <CompoundTypeahead onSelect={onSelectCompound} />
+        </div>
+        <div className="chemsrch-saved-bar">
+          <button className="chemsrch-saved-toggle" onClick={() => setShowSaved(!showSaved)}>
+            <SavedSearchIcon />
+            Saved Searches ({savedSearches.length})
+            <span className="chemsrch-saved-chevron">{showSaved ? '▲' : '▼'}</span>
+          </button>
+        </div>
       </div>
 
       {showSaved && (
