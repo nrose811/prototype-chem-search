@@ -26,7 +26,7 @@ const sidebarItems = [
   },
   {
     icon: 'chemistry',
-    label: 'Molecule Search',
+    label: 'Compound Search',
     path: '/chemical-search',
   },
   {

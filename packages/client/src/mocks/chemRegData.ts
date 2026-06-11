@@ -83,6 +83,48 @@ export function lipinskiRuleOfFive(c: ChemRegCompound): LipinskiResult {
 }
 
 // ---------------------------------------------------------------------------
+// Structure-derived molecular properties
+// Computed from the molecular formula / SMILES — the kind of fields a
+// cheminformatics toolkit (e.g. RDKit) writes into an SDF/MOL record.
+// No assay or experimental data here.
+// ---------------------------------------------------------------------------
+
+// Monoisotopic (exact) masses of the most abundant isotope, in Da.
+const MONOISOTOPIC_MASS: Record<string, number> = {
+  H: 1.007825, C: 12.0, N: 14.003074, O: 15.994915, F: 18.998403,
+  P: 30.973762, S: 31.972071, Cl: 34.968853, Br: 78.918338, I: 126.904473,
+  Na: 22.989770, K: 38.963707, B: 11.009305, Si: 27.976927, Se: 79.916522,
+};
+
+/** Monoisotopic (exact) mass derived from the molecular formula. */
+export function computeExactMass(formula: string): number {
+  const counts = parseFormula(formula);
+  let mass = 0;
+  for (const [el, n] of Object.entries(counts)) {
+    mass += (MONOISOTOPIC_MASS[el] ?? 0) * n;
+  }
+  return mass;
+}
+
+/** Count of non-hydrogen (heavy) atoms, derived from the molecular formula. */
+export function countHeavyAtoms(formula: string): number {
+  const counts = parseFormula(formula);
+  return Object.entries(counts).reduce((sum, [el, n]) => sum + (el === 'H' ? 0 : n), 0);
+}
+
+/** Net formal charge, derived from bracketed charges (e.g. [N+], [O-]) in the SMILES. */
+export function computeFormalCharge(smiles: string): number {
+  let charge = 0;
+  for (const atom of smiles.match(/\[[^\]]*\]/g) ?? []) {
+    for (const sign of atom.match(/[+-]\d*/g) ?? []) {
+      const n = sign.length > 1 ? parseInt(sign.slice(1), 10) : 1;
+      charge += sign[0] === '+' ? n : -n;
+    }
+  }
+  return charge;
+}
+
+// ---------------------------------------------------------------------------
 // 20 registered compounds (with drug-likeness properties)
 // ---------------------------------------------------------------------------
 export const CHEM_REG_COMPOUNDS: ChemRegCompound[] = [

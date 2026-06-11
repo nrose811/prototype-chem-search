@@ -13,7 +13,7 @@ const pageTitles: Record<string, string> = {
   '/visualize': 'Visualize data',
   '/dashboards': 'Dashboards',
   '/upload': 'Upload',
-  '/chemical-search': 'Molecule Search',
+  '/chemical-search': 'Compound Search',
 };
 
 interface ToolbarProps {

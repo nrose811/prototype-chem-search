@@ -1,0 +1,338 @@
+/* ============================================================
+   CompoundCard — full-view compound card
+   ============================================================ */
+
+.cmpd-card {
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 24px 28px;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	color: #0f172a;
+	/* Internals respond to the card's OWN width (works inside a grid),
+	   not the viewport — see @container rules at the bottom. */
+	container-type: inline-size;
+}
+
+/* Header */
+.cmpd-card-header {
+	margin-bottom: 18px;
+}
+.cmpd-card-name {
+	font-size: 26px;
+	font-weight: 700;
+	margin: 0 0 6px;
+	color: #0f172a;
+}
+.cmpd-card-subline {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.cmpd-card-id {
+	font-size: 13px;
+	color: #64748b;
+}
+.cmpd-card-chip {
+	font-size: 12px;
+	font-weight: 600;
+	color: #334155;
+	background: #f1f5f9;
+	border: 1px solid #e2e8f0;
+	border-radius: 999px;
+	padding: 2px 10px;
+}
+
+/* Stat tiles */
+.cmpd-card-tiles {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 12px;
+	margin-bottom: 20px;
+}
+.cmpd-tile {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 10px 12px;
+	background: #f8fafc;
+}
+.cmpd-tile-label {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #94a3b8;
+}
+.cmpd-tile-value {
+	font-size: 15px;
+	font-weight: 600;
+	color: #0f172a;
+}
+.cmpd-formula {
+	font-variant-ligatures: none;
+}
+
+.cmpd-card-divider {
+	height: 1px;
+	background: #e2e8f0;
+	margin: 4px 0 20px;
+}
+
+/* Body layout */
+.cmpd-card-body {
+	display: flex;
+	gap: 28px;
+	align-items: flex-start;
+}
+.cmpd-card-main {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.cmpd-card-structure {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 12px;
+	background: #fff;
+}
+.cmpd-structure-hint {
+	font-size: 11px;
+	color: #94a3b8;
+}
+
+/* Sections */
+.cmpd-section {
+	margin-bottom: 18px;
+}
+.cmpd-section-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: #475569;
+	margin-bottom: 10px;
+}
+.cmpd-section-bar {
+	width: 3px;
+	height: 14px;
+	border-radius: 2px;
+	display: inline-block;
+}
+.cmpd-section-bar.blue {
+	background: #3b82f6;
+}
+.cmpd-section-bar.indigo {
+	background: #6366f1;
+}
+.cmpd-section-bar.amber {
+	background: #f59e0b;
+}
+.cmpd-section-icon {
+	color: #94a3b8;
+	font-size: 12px;
+}
+
+/* SMILES block */
+.cmpd-smiles-block {
+	background: #0f172a;
+	border-radius: 8px;
+	padding: 10px 14px;
+	overflow-x: auto;
+}
+.cmpd-smiles-block code {
+	font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+	font-size: 13px;
+	color: #e2e8f0;
+	white-space: nowrap;
+}
+
+/* Two-column descriptor grid */
+.cmpd-card-cols {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 28px;
+}
+.cmpd-prop-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	padding: 8px 0;
+	border-bottom: 1px solid #f1f5f9;
+}
+.cmpd-prop-label {
+	font-size: 13px;
+	color: #64748b;
+}
+.cmpd-prop-value {
+	font-size: 14px;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+/* Lipinski banner */
+.cmpd-lipinski {
+	margin-top: 18px;
+	border-radius: 10px;
+	padding: 14px 16px;
+	border: 1px solid;
+}
+.cmpd-lipinski.pass {
+	background: #f0fdf4;
+	border-color: #bbf7d0;
+}
+.cmpd-lipinski.fail {
+	background: #fef2f2;
+	border-color: #fecaca;
+}
+.cmpd-lipinski-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+.cmpd-lipinski-icon {
+	font-weight: 700;
+}
+.cmpd-lipinski.pass .cmpd-lipinski-icon {
+	color: #16a34a;
+}
+.cmpd-lipinski.fail .cmpd-lipinski-icon {
+	color: #dc2626;
+}
+.cmpd-lipinski-status {
+	margin-left: auto;
+	font-size: 12px;
+	font-weight: 600;
+	color: #475569;
+}
+.cmpd-lipinski-rules {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.cmpd-lipinski-rule {
+	font-size: 11px;
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 3px 8px;
+}
+.cmpd-lipinski-rule.pass {
+	background: #dcfce7;
+	color: #166534;
+}
+.cmpd-lipinski-rule.fail {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+/* Registration meta */
+.cmpd-card-meta {
+	display: flex;
+	gap: 32px;
+	margin-top: 20px;
+	padding-top: 16px;
+	border-top: 1px solid #e2e8f0;
+}
+.cmpd-meta-item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.cmpd-meta-label {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #94a3b8;
+}
+.cmpd-meta-value {
+	font-size: 14px;
+	color: #334155;
+}
+
+/* CTA */
+.cmpd-find-files-btn {
+	margin-top: 20px;
+	background: #16a34a;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 12px 20px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.15s;
+}
+.cmpd-find-files-btn:hover {
+	background: #15803d;
+}
+
+.mono {
+	font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+}
+
+/* Responsive: when the CARD ITSELF is narrow (e.g. in a 2-up grid),
+   stack the structure below the data and collapse to a single column so
+   the structure can never overlap the descriptors. Container query =
+   based on the card's width, independent of the viewport. */
+@container (max-width: 640px) {
+	.cmpd-card-body {
+		flex-direction: column;
+	}
+	.cmpd-card-structure {
+		align-self: stretch;
+	}
+	.cmpd-card-cols {
+		grid-template-columns: 1fr;
+		gap: 0;
+	}
+	.cmpd-card-tiles {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ============================================================
+   CompoundCardModal — full-card expand overlay
+   ============================================================ */
+
+.cmpd-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.5);
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding: 40px 20px;
+	overflow-y: auto;
+	z-index: 1000;
+}
+.cmpd-modal {
+	position: relative;
+	width: 100%;
+	max-width: 880px;
+}
+.cmpd-modal-close {
+	position: absolute;
+	top: 14px;
+	right: 16px;
+	background: transparent;
+	border: none;
+	font-size: 26px;
+	line-height: 1;
+	color: #94a3b8;
+	cursor: pointer;
+	z-index: 1;
+}
+.cmpd-modal-close:hover {
+	color: #475569;
+}
