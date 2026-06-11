@@ -8,7 +8,7 @@ Align the prototype's compound search flow with UX/design patterns from the Take
 ## Locked decisions
 1. **Card data scope**: visual style only. Show **structure-derived descriptors + registration/identity tags** typical of an SDF/MOL file. NO assay/experimental or catalog data.
    - DROP from reference card: Hansen Solubility Parameters (δD/δP/δH), melting point, boiling point, density, heat of fusion, supplier, physical-state badge.
-2. **Multi-card layout**: stacked, all cards expanded, vertical scroll.
+2. **Multi-card layout**: responsive grid (2-up on wide, 1-up on narrow), all cards expanded.
 3. **Styling**: current MUI + per-component CSS. No Tailwind, no TS-UI upgrade.
 4. **Safety**: feature branch + PR.
 

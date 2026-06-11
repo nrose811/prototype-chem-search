@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import KetcherEditor, { type KetcherEditorHandle } from '../components/KetcherEditor';
 import MoleculeCard from '../components/MoleculeCard';
+import CompoundCard, { CompoundCardModal } from '../components/CompoundCard';
 import CustomTable from '../components/CustomTable';
 import {
   searchCompounds,
@@ -9,7 +10,6 @@ import {
   formatFileSize,
   formatDate,
   fileTypeColor,
-  lipinskiRuleOfFive,
   DEFAULT_SEARCH_OPTIONS,
   type ChemRegCompound,
   type SearchResult,
@@ -83,6 +83,13 @@ function ChemicalSearchPage() {
     setDetailCompound(compound);
     setStep(3);
   }, []);
+
+  // ── Step 2 → 3: View all selected compounds (multi-card grid) ─
+  const handleViewSelected = useCallback(() => {
+    if (selectedCompounds.length === 0) return;
+    setDetailCompound(null); // null → detail step renders the selected set
+    setStep(3);
+  }, [selectedCompounds]);
 
   // ── Step 2/3 → 4: Find files for selected compounds ──────
   const handleFindFiles = useCallback(() => {
@@ -208,13 +215,14 @@ function ChemicalSearchPage() {
           onSelectedChange={setSelectedCompounds}
           onOptionsChange={handleOptionsChange}
           onViewDetail={handleViewDetail}
+          onViewSelected={handleViewSelected}
           onFindFiles={handleFindFiles}
         />
       )}
 
-      {step === 3 && detailCompound && (
+      {step === 3 && (detailCompound || selectedCompounds.length > 0) && (
         <CompoundDetailStep
-          compound={detailCompound}
+          compounds={detailCompound ? [detailCompound] : selectedCompounds}
           onFindFiles={handleFindFiles}
         />
       )}
@@ -433,6 +441,7 @@ function SearchResultsStep({
   onSelectedChange,
   onOptionsChange,
   onViewDetail,
+  onViewSelected,
   onFindFiles,
 }: {
   querySmiles: string;
@@ -442,10 +451,12 @@ function SearchResultsStep({
   onSelectedChange: (compounds: ChemRegCompound[]) => void;
   onOptionsChange: (opts: Partial<SearchOptions>) => void;
   onViewDetail: (c: ChemRegCompound) => void;
+  onViewSelected: () => void;
   onFindFiles: () => void;
 }) {
   const [sortKey, setSortKey] = useState<string>('similarity');
   const [sortAsc, setSortAsc] = useState(false);
+  const [expandedCompound, setExpandedCompound] = useState<ChemRegCompound | null>(null);
   const selectedIds = useMemo(() => new Set(selectedCompounds.map((c) => c.molId)), [selectedCompounds]);
 
   const handleSort = useCallback((key: string) => {
@@ -501,7 +512,15 @@ function SearchResultsStep({
             onClick={(e) => e.stopPropagation()}
           />
         ),
-        structure: <MoleculeCard smiles={r.compound.smiles} width={100} height={70} />,
+        structure: (
+          <div
+            className="chemsrch-structure-thumb"
+            title="Click to expand compound card"
+            onClick={(e) => { e.stopPropagation(); setExpandedCompound(r.compound); }}
+          >
+            <MoleculeCard smiles={r.compound.smiles} width={100} height={70} expandable={false} />
+          </div>
+        ),
         name: r.compound.name,
         molId: <span style={{ fontFamily: 'monospace', fontSize: 12 }}>{r.compound.molId}</span>,
         formula: r.compound.formula,
@@ -585,9 +604,14 @@ function SearchResultsStep({
           {selectedCompounds.length > 0 ? `${selectedCompounds.length} selected` : 'Select all'}
         </label>
         {selectedCompounds.length > 0 && (
-          <button className="chemsrch-find-selected-btn" onClick={onFindFiles}>
-            Find Files for Selected ({selectedCompounds.length})
-          </button>
+          <>
+            <button className="chemsrch-view-selected-btn" onClick={onViewSelected}>
+              View Details ({selectedCompounds.length})
+            </button>
+            <button className="chemsrch-find-selected-btn" onClick={onFindFiles}>
+              Find Files for Selected ({selectedCompounds.length})
+            </button>
+          </>
         )}
         <div style={{ flex: 1 }} />
         <span className="chemsrch-sort-label">Sort by:</span>
@@ -608,6 +632,10 @@ function SearchResultsStep({
         columns={columns}
         onRowClick={(row: any) => onViewDetail(row._compound)}
       />
+
+      {expandedCompound && (
+        <CompoundCardModal compound={expandedCompound} onClose={() => setExpandedCompound(null)} />
+      )}
     </div>
   );
 }
@@ -615,109 +643,30 @@ function SearchResultsStep({
 // ── Step 3: Molecule Detail ──────────────────────────────────
 
 function CompoundDetailStep({
-  compound,
+  compounds,
   onFindFiles,
 }: {
-  compound: ChemRegCompound;
+  compounds: ChemRegCompound[];
   onFindFiles: () => void;
 }) {
-  const lipinski = lipinskiRuleOfFive(compound);
+  const multi = compounds.length > 1;
 
   return (
     <div className="chemsrch-detail-step">
-      <div className="chemsrch-detail-layout">
-        <div className="chemsrch-detail-structure">
-          <MoleculeCard smiles={compound.smiles} width={280} height={200} name={compound.name} showSmiles />
+      {multi && (
+        <div className="chemsrch-detail-count">
+          {compounds.length} compounds selected
         </div>
-
-        <div className="chemsrch-detail-properties">
-          <h2>{compound.name}</h2>
-
-          <div className="chemsrch-prop-grid">
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Mol ID</span>
-              <span className="chemsrch-prop-value mono">{compound.molId}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Formula</span>
-              <span className="chemsrch-prop-value">{compound.formula}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Molecular Weight</span>
-              <span className="chemsrch-prop-value">{compound.mw.toFixed(1)} Da</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">CAS Number</span>
-              <span className="chemsrch-prop-value mono">{compound.casNumber}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Registered</span>
-              <span className="chemsrch-prop-value">{formatDate(compound.registrationDate)}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Registered By</span>
-              <span className="chemsrch-prop-value">{compound.registeredBy}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Project</span>
-              <span className="chemsrch-prop-value">{compound.project}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Stereocenters</span>
-              <span className="chemsrch-prop-value">{compound.stereocenters}</span>
-            </div>
-          </div>
-
-          <h3 className="chemsrch-section-title">Drug-Likeness Properties</h3>
-          <div className="chemsrch-prop-grid">
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">LogP</span>
-              <span className="chemsrch-prop-value">{compound.logP.toFixed(1)}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">TPSA</span>
-              <span className="chemsrch-prop-value">{compound.tpsa.toFixed(1)} &#8491;&sup2;</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">H-Bond Acceptors</span>
-              <span className="chemsrch-prop-value">{compound.hba}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">H-Bond Donors</span>
-              <span className="chemsrch-prop-value">{compound.hbd}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Rotatable Bonds</span>
-              <span className="chemsrch-prop-value">{compound.rotatableBonds}</span>
-            </div>
-            <div className="chemsrch-prop">
-              <span className="chemsrch-prop-label">Ring Count</span>
-              <span className="chemsrch-prop-value">{compound.ringCount}</span>
-            </div>
-          </div>
-
-          <div className={`chemsrch-lipinski ${lipinski.pass ? 'pass' : 'fail'}`}>
-            <div className="chemsrch-lipinski-header">
-              <span className="chemsrch-lipinski-icon">{lipinski.pass ? '✓' : '✗'}</span>
-              <strong>Lipinski Rule of 5</strong>
-              <span className="chemsrch-lipinski-status">
-                {lipinski.pass ? 'PASS' : 'FAIL'} ({lipinski.violations} violation{lipinski.violations !== 1 ? 's' : ''})
-              </span>
-            </div>
-            <div className="chemsrch-lipinski-rules">
-              {lipinski.details.map((d) => (
-                <span key={d.rule} className={`chemsrch-lipinski-rule ${d.pass ? 'pass' : 'fail'}`}>
-                  {d.rule}: {typeof d.value === 'number' ? d.value.toFixed(1) : d.value}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <button className="chemsrch-find-files-btn" onClick={onFindFiles}>
-            Find Associated Data Files
-          </button>
-        </div>
+      )}
+      <div className={`cmpd-card-grid ${multi ? 'multi' : ''}`}>
+        {compounds.map((c) => (
+          <CompoundCard key={c.molId} compound={c} />
+        ))}
       </div>
+
+      <button className="cmpd-find-files-btn chemsrch-detail-cta" onClick={onFindFiles}>
+        Find Associated Data Files{multi ? ` (${compounds.length} compounds)` : ''}
+      </button>
     </div>
   );
 }

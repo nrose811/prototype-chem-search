@@ -477,6 +477,48 @@
 }
 .chemsrch-find-selected-btn:hover { background: #219a52; }
 
+/* View Details (multi-select) button */
+.chemsrch-view-selected-btn {
+  padding: 6px 14px;
+  background: #fff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chemsrch-view-selected-btn:hover { background: #eff6ff; }
+
+/* Clickable structure thumbnail in results table */
+.chemsrch-structure-thumb {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: box-shadow 0.15s;
+  display: inline-block;
+}
+.chemsrch-structure-thumb:hover {
+  box-shadow: 0 0 0 2px #bfdbfe;
+}
+
+/* Compound Detail — card grid */
+.chemsrch-detail-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+.cmpd-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+.cmpd-card-grid.multi {
+  grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
+}
+.chemsrch-detail-cta {
+  align-self: flex-start;
+}
+
 /* Result count badge */
 .chemsrch-result-count {
   display: inline-flex;
