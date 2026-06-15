@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react';
+import { smilesToMolblock } from '../utils/smilesToMolblock';
 import './KetcherEditor.css';
 
 export interface KetcherEditorHandle {
@@ -97,11 +98,15 @@ const KetcherEditor = forwardRef<KetcherEditorHandle, Props>(
         });
       },
       async setSmiles(smiles: string) {
-        // Remember the request so it survives a not-yet-ready editor; applied
-        // now if ready, otherwise flushed on the 'ready' message.
-        pendingSmilesRef.current = smiles;
+        // Ketcher needs coordinates to render — convert SMILES to a molblock
+        // (with 2D coords) via RDKit, falling back to the raw SMILES. Remember
+        // the result so it survives a not-yet-ready editor; applied now if
+        // ready, otherwise flushed on the 'ready' message.
+        const molblock = await smilesToMolblock(smiles);
+        const payload = molblock ?? smiles;
+        pendingSmilesRef.current = payload;
         if (ready && iframeRef.current?.contentWindow) {
-          postSetSmiles(smiles);
+          postSetSmiles(payload);
         }
       },
     }));
