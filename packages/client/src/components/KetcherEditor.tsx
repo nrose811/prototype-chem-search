@@ -19,6 +19,17 @@ const KetcherEditor = forwardRef<KetcherEditorHandle, Props>(
     const [loadFailed, setLoadFailed] = useState(false);
     const [ready, setReady] = useState(false);
     const pendingRef = useRef<Map<number, (smiles: string) => void>>(new Map());
+    // Last SMILES requested via setSmiles — applied (or re-applied) once the
+    // iframe is ready, so picking a compound before Ketcher finishes loading
+    // still draws the structure.
+    const pendingSmilesRef = useRef<string | null>(null);
+
+    const postSetSmiles = useCallback((smiles: string) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { source: 'ketcher-parent', type: 'setSmiles', smiles },
+        '*',
+      );
+    }, []);
 
     const handleMessage = useCallback(
       (e: MessageEvent) => {
@@ -28,6 +39,10 @@ const KetcherEditor = forwardRef<KetcherEditorHandle, Props>(
         if (msg.type === 'ready') {
           setReady(true);
           onInit?.();
+          // Apply any structure requested before Ketcher finished loading.
+          if (pendingSmilesRef.current) {
+            postSetSmiles(pendingSmilesRef.current);
+          }
         }
 
         if (msg.type === 'smiles' && msg.payload) {
@@ -43,7 +58,7 @@ const KetcherEditor = forwardRef<KetcherEditorHandle, Props>(
           setLoadFailed(true);
         }
       },
-      [onInit],
+      [onInit, postSetSmiles],
     );
 
     useEffect(() => {
@@ -82,11 +97,12 @@ const KetcherEditor = forwardRef<KetcherEditorHandle, Props>(
         });
       },
       async setSmiles(smiles: string) {
-        if (!ready || !iframeRef.current?.contentWindow) return;
-        iframeRef.current.contentWindow.postMessage(
-          { source: 'ketcher-parent', type: 'setSmiles', smiles },
-          '*',
-        );
+        // Remember the request so it survives a not-yet-ready editor; applied
+        // now if ready, otherwise flushed on the 'ready' message.
+        pendingSmilesRef.current = smiles;
+        if (ready && iframeRef.current?.contentWindow) {
+          postSetSmiles(smiles);
+        }
       },
     }));
 
